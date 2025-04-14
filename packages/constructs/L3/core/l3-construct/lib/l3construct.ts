@@ -14,6 +14,10 @@ import { Construct } from 'constructs';
 export interface MdaaL3ConstructProps extends MdaaConstructProps {
   readonly roleHelper: MdaaRoleHelper;
   readonly crossAccountStacks?: { [account: string]: Stack };
+  /** Tags to be applied directly to resources. */
+  readonly tags?: {
+    [key: string]: string;
+  };
 }
 
 /**

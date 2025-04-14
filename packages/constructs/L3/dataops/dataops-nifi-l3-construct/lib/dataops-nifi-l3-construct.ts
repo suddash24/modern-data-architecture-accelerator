@@ -918,6 +918,7 @@ export class NifiL3Construct extends MdaaL3Construct {
       subnets: subnets,
       naming: this.props.naming,
       securityGroup: clusterSecurityGroup,
+      tags: this.props.tags,
     };
 
     return new MdaaEKSCluster(this, 'eks-cluster', clusterProps);

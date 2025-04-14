@@ -294,6 +294,7 @@ export class MdaaEKSCluster extends Cluster {
         ClusterLoggingTypes.SCHEDULER,
       ],
     };
+
     const allProps: ClusterProps = {
       ...props,
       ...overrideProps,
