@@ -452,6 +452,7 @@ export abstract class MdaaCdkApp extends App {
       naming: this.naming,
       roleHelper: stack.roleHelper,
       crossAccountStacks: this.additionalAccountStacks,
+      tags: this.tags,
     };
   }
   /**
