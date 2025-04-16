@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0] - 2025-04-18
+
+### General Availability Release
+
+* Promoted Modern Data Architecture Accelerator (MDAA) to General Availability status
+
 ## 0.45.0
 
 ### General Changes
