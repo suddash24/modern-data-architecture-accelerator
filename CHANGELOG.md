@@ -1,12 +1,12 @@
-# Changelog
+# Change Log
 
 ## [1.0.0] - 2025-04-18
 
 ### General Availability Release
 
-* Promoted Modern Data Architecture Accelerator (MDAA) to General Availability status
+* Modern Data Architecture Accelerator (MDAA) released to GA status
 
-## 0.45.0
+## [0.45.0]
 
 ### General Changes
 
@@ -42,13 +42,13 @@
   * A DataZone Custom Environment and subscription target will be created per DataZone project, pointing at DataOps project resources
   * A DataZone Data Source may be created per Glue Database within the DataOps project, allowing for publishing of data assets within each database
 
-## 0.44.0
+## [0.44.0]
 
 ### General Changes
 
 * Fixed bug with eventbridge app for conflicting eventbus policy statement ids
 
-## 0.43.0
+## [0.43.0]
 
 ### General Changes
 
@@ -113,7 +113,7 @@
 * DataWarehouse - Added config param `redshiftManageMasterPassword` to push Admin credentials management into Redshift service
 
 
-## 0.42.0
+## [0.42.0]
 
 ### General Changes
 
@@ -159,7 +159,7 @@
 
 * Fixed an issue with `accessRoleArn` in Sftp Users config
 
-## 0.41.0
+## [0.41.0]
 
 ### Governance Changes
 
@@ -227,7 +227,7 @@
 * Added DynamoDB L2 Constructs
 * Added RDS Aurora L2 Constructs
 
-## 0.40.0
+## [0.40.0]
 
 ### General Changes
 
@@ -265,13 +265,13 @@
 * Added preview reusable compliant constructs for EKS Fargate clusters
 * Added preview reusable compliant constructs for ECS Tasks and Services
 
-## 0.39.0
+## [0.39.0]
 
 ### Utility Changes
 
 * Modified EC2 Cfn-Init to use inline fdile content in Cfn templates as a workaround to Asset resource naming collisions.
 
-## 0.38.0
+## [0.38.0]
 
 ### General Changes
 
@@ -297,7 +297,7 @@
 
 * Updated m2m-api module to support multi-part uploads.
 
-## 0.37.0
+## [0.37.0]
 
 ### General Changes
 
@@ -326,7 +326,7 @@
 * Added Lifecycle Config Assets to SageMaker Notebooks
 * Aligned Lifecycle Config syntax between Studio and Notebooks
 
-## 0.36.0
+## [0.36.0]
 
 ### General Changes
 
@@ -367,7 +367,7 @@
   * Currently supports an upload API to facilitate uploads of data to the data lake from external entities
   * Authorization is provided by Cognito App Integrations
 
-## 0.35.0
+## [0.35.0]
 
 ### Documentation Changes
 
@@ -394,7 +394,7 @@
 * Modified Data Ops Job failure notifications to include "TIMEOUT" and "STOPPED" states in addition to "FAILED"
 * Improved integration between DataOps project and Lakeformation, fixing a race condition in cross account resource link grants.
 
-## 0.34.0
+## [0.34.0]
 
 ### Data Science Changes
 
@@ -415,7 +415,7 @@
   * This protects against scenarios where an unencrypted AMI deploys unencrypted volumes not managed via the config.
   * AMI volumes can be forced to be encrypted by accounting for each (by device name) in Instance config
 
-## 0.33.0
+## [0.33.0]
 
 ### Utility Changes
 
@@ -457,7 +457,7 @@
 
 * Adjust Data Science Team SageMaker permissions
 
-## 0.32.0
+## [0.32.0]
 
 ### General Changes
 
@@ -501,7 +501,7 @@
 
 * Fixed issue with Self-Referencing ingress/egress rule in EC2 Security Group
 
-## 0.31.0
+## [0.31.0]
 
 ### General Changes
 
@@ -535,7 +535,7 @@
 
 * Improved test coverage across codebase
 
-## 0.30.0
+## [0.30.0]
 
 ### General Changes
 
@@ -571,7 +571,7 @@
 * Added Boto3 Lambda Layer contstruct to L2 Lambda package, to provide a reusable layer containing the latest Boto3 version
 
 
-## 0.29.0
+## [0.29.0]
 
 * Modified Data Science Team module to allow provisioning of per-team SageMaker Studio Domains
 * Modified Studio Domain construct to set ExecutionRoleIdentityConfig to USER_PROFILE_NAME, improving auditability of user interactions with AWS services from within SageMaker Studio
@@ -581,26 +581,26 @@
 * Removed execution role definitions from DataWarehouse module. These should instead be defined in the Roles module, and referenced by DataWarehouse module
 * Added CloudWatch LogGroup L2 Construct
 
-## 0.28.0
+## [0.28.0]
 
 * Added configuration for StepFunction Log Group Retention
 * Removed logic granting SSM Param access to roles granted access to Redshift user secrets
 * Standardized App config parser class names
 * Various bug fixes related to config parsing and reference resolution
 
-## 0.27.0
+## [0.27.0]
 
 * Added DataOps StepFunctions app and constructs
-* Updated CDK version to current latest 2.54.0
+* Updated CDK version to current latest 2.54.0]
 * Added ability to grant roles access to Secrets generated for Redshift credentials
 * Standardized naming of L3 Construct Props
 * Modified DataBrew package names to match convention
 
-## 0.26.0
+## [0.26.0]
 
 * Fix issues with bootstrap behaviour
 
-## 0.25.0
+## [0.25.0]
 
 * Added ServiceCatalog integration, allowing any MDAA module to be optionally deployed as a Service Catalog Product instead of directly into account
 * Added QuickSight Shared Folders and Permissions module
@@ -617,13 +617,13 @@
 * Added -u parameter to MDAA CLI to allow specifying the MDAA module version ('mdaa_version' in config files) on the command line
 * Continued improvements to test coverage (now globally over 78% lines covered)
 
-## 0.24.0
+## [0.24.0]
 
 * Modified roles module to allow existing customer managed policies to be added (by name) to generated roles
 * Modified roles module to allow policies to be generated with verbatim names (required for SSO permission set integration)
 * Fixed bug in Dataops Project when multiple databases with LF grants were configured
 
-## 0.23.0
+## [0.23.0]
 
 * Added SageMaker Notebook L2/L3 Constructs and App/Module
 * Added SageMaker Studio Custom SecurityGroup Ingress/Egress
@@ -645,7 +645,7 @@
 * Moved configuration samples into ./samples/configuration location in repo
 * Incorporated SonarQube into CI/CD process, resulting in improved test coverage and code quality
 
-## 0.22.0
+## [0.22.0]
 
 * DataOps Projects now create an SNS topic to which all jobs and crawlers will send failure notifications.
   * SNS topic can currently be configured with email address subscribers
@@ -657,22 +657,22 @@
     * SFTP Users
   * README sample configs have been updated for all affected modules.
 
-## 0.21.0
+## [0.21.0]
 
 * Glue workflows now sets StartOnCreation property to 'true' automatically if the Trigger State=ACTIVATED
 
-## 0.20.0
+## [0.20.0]
 
 * Resolved ConcurrentModificationException when many triggers add to the same workflow
 * 'mdaa destroy' will now attempt to destroy stacks in reverse order of creation.
 
-## 0.19.0
+## [0.19.0]
 
 * Added warehouseBucketUserRoles to Warehouse App to allow non-admin access to Warehouse bucket to be granted
 * Moved job and crawler monitoring event bridge rules to job and crawler apps (from Workflow app)
   * An EventBridge rule will now be created per job/crawler
 
-## 0.18.0
+## [0.18.0]
 
 * Modify DataWarehouse to not create secret rotation if rotationDays is 0
   * Note that this triggers a CDK Nag which needs to be suppressed (see below)
@@ -684,11 +684,11 @@
 * Refactored and cleaned up code smells from SonarQube
 * Added ability to configure Redshift snapshot retention period
 
-## 0.17.0
+## [0.17.0]
 
 * Resolve deployment role naming issue with DataOps Project
 
-## 0.16.0
+## [0.16.0]
 
 * Added global/domain/module mdaa_version configuration param to allow MDAA version to specified at various locations in the MDAA config
 * Removed the MDAA version from the mdaa_cdk_app tag to reduce CDK diff churn during MDAA upgrades/deployments
@@ -698,36 +698,36 @@
 * Improved Dynamic Reference docs
 * Added custom CDK aspects to MDAA configuration. These are dynamically injected at MDAA execution time similar to custom naming implementations.
 
-## 0.15.0
+## [0.15.0]
 
 * Replace 'Ecosystem' with 'Environment' across MDAA codebase.
 
-## 0.14.0
+## [0.14.0]
 
 * Fix dependency issue between LF Locations and LF Grants in DataLake Stack
 * Modify DataWarehouse to generate scheduled action starttime in future if required
 * Modify DataLake to always add bucket allow statement even if DefaultDeny is false
 * Modify DataLake to accept defaultDeny configuration per bucket instead of per access policy
 
-## 0.13.0
+## [0.13.0]
 
 * Added LF Data Location grants to Data Lake Stack, based on configured Lake Formation Resource Locations. Specified roles will be granted access to create catalog resources in the specified location.
 * Added RedShift user and secret creation to DataWarehouse App/Stack, allowing for non-admin users to be managed by MDAA configuration. A secret will be created containing the credentials for each user, with configurable rotation.
 * Added -h (help) flag to MDAA cli, which will print available cli flags and exit
 * Added -r (role) flag to MDAA cli, which will pass the specified role arn to the -r flag of the underlying CDK command. This allows deployment to be conducted using non-default roles.
 
-## 0.12.0
+## [0.12.0]
 
 * Lock CDK version (currently 2.29.0)
   * Resolves compatability issue introduced by <https://github.com/aws/aws-cdk/pull/20911>
 * Added public IP support to SFTP Server
 * Added Data Science Team App and Stack
 
-## 0.11.0
+## [0.11.0]
 
 Dependency cleanup
 
-## 0.10.0
+## [0.10.0]
 
 ### Configuration Changes
 
