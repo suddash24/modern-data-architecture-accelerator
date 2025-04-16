@@ -80,14 +80,14 @@ echo "--------------------------------------------------------------------------
 echo "[Packing] Reference folder"
 echo "------------------------------------------------------------------------------"
 
-echo "cp -r $sample_configs_dir $dist_dir"
-cp -r $sample_configs_dir $dist_dir
+echo "cp -r $sample_configs_dir $dist_dir/sample_configs"
+cp -r $sample_configs_dir $dist_dir/sample_configs
 
-echo "cp -r $sample_code_dir $dist_dir"
-cp -r $sample_code_dir $dist_dir
+echo "cp -r $sample_code_dir $dist_dir/sample_code"
+cp -r $sample_code_dir $dist_dir/sample_code
 
-echo "cp -r $sample_blueprints_dir $dist_dir"
-cp -r $sample_blueprints_dir $dist_dir
+echo "cp -r $sample_blueprints_dir $dist_dir/sample_blueprints"
+cp -r $sample_blueprints_dir $dist_dir/sample_blueprints
 
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Files from the root level of the project"
@@ -110,9 +110,6 @@ cp $source_template_dir/../CONTRIBUTING.md $dist_dir
 
 echo "cp $source_template_dir/../CHANGELOG.md $dist_dir"
 cp $source_template_dir/../CHANGELOG.md $dist_dir
-
-echo "cp $source_template_dir/../DEVELOPING.md $dist_dir"
-cp $source_template_dir/../DEVELOPING.md $dist_dir
 
 echo "cp $source_template_dir/../FAQ.md $dist_dir"
 cp $source_template_dir/../FAQ.md $dist_dir

@@ -37,3 +37,7 @@ test-template.json
 *.zip
 # **/python/*
 !**/python/.gitkeep
+!deployment/cdk-solution-helper/index.js
+deployment/cdk-solution-helper/package-lock.json
+deployment/global-s3-assets*
+deployment/regional-s3-assets*
