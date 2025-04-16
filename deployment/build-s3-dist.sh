@@ -4,15 +4,13 @@
 # used as an input to the solution builder validation pipeline.
 #
 # Important notes and prereq's:
-#   1. The initialize-repo.sh script must have been run in order for this script to
-#      function properly.
-#   2. This script should be run from the repo's /deployment folder.
+#   1. This script should be run from the repo's /deployment folder.
 #
 # This script will perform the following tasks:
 #   1. Remove any old dist files from previous runs.
 #   2. Install dependencies for the cdk-solution-helper; responsible for
-#      converting standard 'cdk synth' output into solution assets.
-#   3. Build and synthesize your CDK project.
+#      converting standard 'npx cdk synth' output into solution assets.
+#   3. Build and synthesize your cdk project.
 #   4. Run the cdk-solution-helper on template outputs and organize
 #      those outputs into the /global-s3-assets folder.
 #   5. Organize source code artifacts into the /regional-s3-assets folder.
@@ -21,8 +19,6 @@
 # Parameters:
 #  - source-bucket-base-name: Name for the S3 bucket location where the template will source the Lambda
 #    code from. The template will append '-[region_name]' to this bucket name.
-#    For example: ./build-s3-dist.sh solutions v1.0.0
-#    The template will then expect the source code to be located in the solutions-[region_name] bucket
 #  - solution-name: name of the solution for consistency
 #  - version-code: version of the package
 #-----------------------
@@ -90,13 +86,15 @@ do_replace()
 
 create_template_json()
 {
-    # Run 'cdk synth' to generate raw solution outputs
-    do_cmd cdk synth --output=$staging_dist_dir
+    # Run 'npx cdk synth' to generate raw solution outputs
+    do_cmd cd $installer_dir
+    do_cmd npm install
+    do_cmd npx cdk synth --output=$staging_dist_dir
 
     # Remove unnecessary output files
     do_cmd cd $staging_dist_dir
     # ignore return code - can be non-zero if any of these does not exist
-    rm tree.json manifest.json cdk.out
+    rm -f tree.json manifest.json cdk.out
 
     # Move outputs from staging to template_dist_dir
     echo "Move outputs from staging to template_dist_dir"
@@ -109,42 +107,59 @@ create_template_json()
         mv -- "$f" "${f%.template.json}.template"
     done
 }
+
 create_template_installer_json()
 {
-    # Run 'cdk synth' to generate raw solution outputs
-    do_cmd cdk synth --output=$staging_dist_dir --context use-permission-boundary=true
+    # Run 'npx cdk synth' to generate raw solution outputs
+    do_cmd cd $installer_dir
+    do_cmd npm install
+    
+    # Generate template with permission boundary
+    do_cmd npx cdk synth --output=$staging_dist_dir --context use-permission-boundary=true
     do_cmd find $staging_dist_dir -name '*InstallerStack.template.json' -exec mv {} {}-CustomBp.template.json \;
 
-    do_cmd cdk synth --output=$staging_dist_dir --context use-external-pipeline-account=true
+    # Generate template with external pipeline
+    do_cmd npx cdk synth --output=$staging_dist_dir --context use-external-pipeline-account=true
     do_cmd find $staging_dist_dir -name '*InstallerStack.template.json' -exec mv {} {}-ExternalPipeline.template.json \;
 
-    do_cmd cdk synth --output=$staging_dist_dir
+    # Generate default template
+    do_cmd npx cdk synth --output=$staging_dist_dir
+    
     # Remove unnecessary output files
     do_cmd cd $staging_dist_dir
     # ignore return code - can be non-zero if any of these does not exist
-    rm tree.json manifest.json cdk.out
+    rm -f tree.json manifest.json cdk.out
 
     # Move outputs from staging to template_dist_dir
     echo "Move outputs from staging to template_dist_dir"
-    do_cmd mv $staging_dist_dir/*.template.json $template_dist_dir/
+    do_cmd mv $staging_dist_dir/*.template.json* $template_dist_dir/
 
-    # Rename all *.template.json files to *.template
-    echo "Rename all *.template.json*.template.json to **.template"
+    # Rename all *.template.json*.template.json to *.template
+    echo "Rename all *.template.json*.template.json to *.template"
     echo "copy templates and rename"
-    for f in $template_dist_dir/*.template.json*.template.json; do
-        newname=$(echo "$f" | sed -E 's/\.template\.json-/-/; s/\.json$//')
-        mv -- "$f" "$newname"
+    for f in $template_dist_dir/*.template.json-*.template.json; do
+        if [ -f "$f" ]; then
+            newname=$(echo "$f" | sed -E 's/\.template\.json-/-/; s/\.json$//')
+            mv -- "$f" "$newname"
+        fi
+    done
+    
+    # Rename standard template files
+    for f in $template_dist_dir/*.template.json; do
+        if [ -f "$f" ]; then
+            mv -- "$f" "${f%.template.json}.template"
+        fi
     done
 }
 
 create_template_yaml()
 {
-    # Assumes current working directory is where the CDK is defined
+    # Assumes current working directory is where the cdk is defined
     # Output YAML - this is currently the only way to do this for multiple templates
     maxrc=0
-    for template in `cdk list`; do
+    for template in `npx cdk list`; do
         echo Create template $template
-        do_cmd cdk synth $template > ${template_dist_dir}/${template}.template
+        do_cmd npx cdk synth $template > ${template_dist_dir}/${template}.template
         if [[ $? > $maxrc ]]; then
             maxrc=$?
         fi
@@ -218,7 +233,7 @@ fi
 # Validate command line input - must provide bucket
 [[ -z $1 ]] && { usage; exit 1; } || { SOLUTION_BUCKET=$1; }
 
-# Environmental variables for use in CDK
+# Environmental variables for use in cdk
 export DIST_OUTPUT_BUCKET=$SOLUTION_BUCKET
 
 # Version from the command line is definitive. Otherwise, use, in order of precedence:
@@ -259,6 +274,7 @@ staging_dist_dir="$template_dir/staging"
 template_dist_dir="$template_dir/global-s3-assets"
 build_dist_dir="$template_dir/regional-s3-assets"
 source_dir="$template_dir/../packages"
+installer_dir="$source_dir/../installer"
 
 echo "------------------------------------------------------------------------------"
 echo "${bold}[Init] Remove any old dist files from previous runs${normal}"
@@ -271,88 +287,58 @@ do_cmd mkdir -p $build_dist_dir
 do_cmd rm -rf $staging_dist_dir
 do_cmd mkdir -p $staging_dist_dir
 
-# General cleanup of node_modules files
-echo "find $staging_dist_dir -iname "node_modules" -type d -exec rm -rf "{}" \; 2> /dev/null"
-find $staging_dist_dir -iname "node_modules" -type d -exec rm -rf "{}" \; 2> /dev/null
 
-# ... For each asset.* source code artifact in the temporary /staging folder...
-cd $staging_dist_dir
-for d in `find . -mindepth 1 -maxdepth 1 -type d`; do
+echo "------------------------------------------------------------------------------"
+echo "${bold}[Init] Install dependencies for the cdk-solution-helper${normal}"
+echo "------------------------------------------------------------------------------"
 
-    # Rename the artifact, removing the period for handler compatibility
-    pfname="$(basename -- $d)"
-    fname="$(echo $pfname | sed -e 's/\.//g')"
-    echo "zip -r $fname.zip $fname"
-    mv $d $fname
+do_cmd cd $template_dir/cdk-solution-helper
+do_cmd npm install
 
-    # Build the artifacts
-    if test -f $fname/requirements.txt; then
-        echo "===================================="
-        echo "This is Python runtime"
-        echo "===================================="
-        cd $fname
-        venv_folder="./venv-prod/"
-        rm -fr .venv-test
-        rm -fr .venv-prod
-        echo "Initiating virtual environment"
-        python3 -m venv $venv_folder
-        source $venv_folder/bin/activate
-        pip3 install -q -r requirements.txt --target .
-        deactivate
-        cd $staging_dist_dir/$fname/$venv_folder/lib/python3.*/site-packages
-        echo "zipping the artifact"
-        zip -qr9 $staging_dist_dir/$fname.zip .
-        cd $staging_dist_dir/$fname
-        zip -gq $staging_dist_dir/$fname.zip *.py util/*
-        cd $staging_dist_dir
-    elif test -f $fname/package.json; then
-        echo "===================================="
-        echo "This is Node runtime"
-        echo "===================================="
-        cd $fname
-        echo "Clean and rebuild artifacts"
-        npm run clean
-        npm ci
-        if [ "$?" = "1" ]; then
-	        echo "ERROR: Seems like package-lock.json does not exists or is out of sync with package.json. Trying npm install instead" 1>&2
-            npm install
-        fi
-        cd $staging_dist_dir
-        # Zip the artifact
-        echo "zip -r $fname.zip $fname"
-        zip -rq $fname.zip $fname
-    else
-        echo "===================================="
-        echo "This is a Directory Asset"
-        echo "===================================="
+echo "------------------------------------------------------------------------------"
+echo "${bold}[Synth] cdk Project${normal}"
+echo "------------------------------------------------------------------------------"
 
-        echo "zip -r $fname.zip $fname"
-        zip -rq $fname.zip $fname
+echo "------------------------------------------------------------------------------"
+echo "${bold}[Create] Templates${normal}"
+echo "------------------------------------------------------------------------------"
+
+if fn_exists create_template_${template_format}; then
+    create_template_installer_${template_format}
+else
+    echo "Invalid setting for \$template_format: $template_format"
+    exit 255
+fi
+
+echo "------------------------------------------------------------------------------"
+echo "${bold}[Packing] Template artifacts${normal}"
+echo "------------------------------------------------------------------------------"
+
+# Run the helper to clean-up the templates and remove unnecessary cdk elements
+echo "Run the helper to clean-up the templates and remove unnecessary cdk elements"
+[[ $run_helper == "true" ]] && {
+    echo "node $template_dir/cdk-solution-helper/index"
+    node $template_dir/cdk-solution-helper/index
+    if [ "$?" = "1" ]; then
+    	echo "(cdk-solution-helper) ERROR: there is likely output above." 1>&2
+    	exit 1
     fi
+} || echo "${bold}Solution Helper skipped: ${normal}run_helper=false"
 
-    if test -f $fname.zip; then
-        # Copy the zipped artifact from /staging to /regional-s3-assets
-        echo "cp $fname.zip $build_dist_dir"
-        cp $fname.zip $build_dist_dir
+# Find and replace bucket_name, solution_name, and version
+echo "Find and replace bucket_name, solution_name, and version"
+cd $template_dist_dir
+do_replace "*.template" %%BUCKET_NAME%% ${SOLUTION_BUCKET}
+do_replace "*.template" %%SOLUTION_NAME%% ${SOLUTION_TRADEMARKEDNAME}
+do_replace "*.template" %%VERSION%% ${SOLUTION_VERSION}
+do_replace "*.template" %%PRODUCT_BUCKET%% ${TEMPLATE_OUTPUT_BUCKET}
 
-        # Remove the old, unzipped artifact from /staging
-        echo "rm -rf $fname"
-        rm -rf $fname
+echo "------------------------------------------------------------------------------"
+echo "${bold}[Packing] Source code artifacts${normal}"
+echo "------------------------------------------------------------------------------"
 
-        # Remove the old, zipped artifact from /staging
-        echo "rm $fname.zip"
-        rm $fname.zip
-        # ... repeat until all source code artifacts are zipped and placed in the
-        # ... /regional-s3-assets folder
-    else
-        echo "ERROR: $fname.zip not found"
-        exit 1
-    fi
-
-done
-
-# This solution does not generate any assets, need to make a file to move the
-# pipeline forward
+# Create a placeholder file in the regional-s3-assets directory
+# This is needed because the original script expects assets but MDAA may not generate any
 touch $build_dist_dir/temp-asset.file
 
 # cleanup temporary generated files that are not needed for later stages of the build pipeline
@@ -360,3 +346,9 @@ cleanup_temporary_generted_files
 
 # Return to original directory from when we started the build
 cd $template_dir
+
+echo "------------------------------------------------------------------------------"
+echo "${bold}[Complete] Template generation complete${normal}"
+echo "------------------------------------------------------------------------------"
+echo "The CloudFormation template is available at: $template_dist_dir"
+echo "A placeholder asset file was created at: $build_dist_dir/temp-asset.file"
