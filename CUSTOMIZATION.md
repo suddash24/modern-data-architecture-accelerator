@@ -28,11 +28,11 @@ The following is the default naming implementation for MDAA. This can be modifie
 /**
  * A default MDAA Naming implementation
  */
-export class ExampleCustomNaming {
+export class MdaaDefaultResourceNaming implements IMdaaResourceNaming {
     public readonly props: MdaaResourceNamingConfig;
 
     constructor( props: MdaaResourceNamingConfig ) {
-        this.props = props
+        this.props = props;
     }
     /**
      * Returns this naming object but with a new moduleName
@@ -45,81 +45,84 @@ export class ExampleCustomNaming {
             org: this.props.org,
             env: this.props.env,
             domain: this.props.domain,
-            moduleName: moduleName
-        }
-        return new MdaaDefaultResourceNaming( newProps )
+            moduleName: moduleName,
+        };
+        return new MdaaDefaultResourceNaming( newProps );
     }
 
     /**
      * Generates a resource name in the format of <org>-<env>-<domain>-<module_name>
      */
     public resourceName ( resourceNameSuffix?: string, maxLength?: number ): string {
-        let name = `${ this.props.org }-${ this.props.env }-${ this.props.domain }-${ this.props.moduleName }`
+        let name = `${this.props.org}-${this.props.env}-${this.props.domain}-${this.props.moduleName}`;
         if ( resourceNameSuffix ) {
-            name = `${ name }-${ resourceNameSuffix.toLowerCase() }`
+          name = `${name}-${this.lowerCase(resourceNameSuffix)}`;
         }
         if ( maxLength && name.length >= maxLength ) {
-            const hashCodeHex = MdaaDefaultResourceNaming.hashCodeHex( name )
-            return `${ name.substring( 0, maxLength - ( hashCodeHex.length + 1 ) ) }-${ hashCodeHex }`
+          const hashCodeHex = MdaaDefaultResourceNaming.hashCodeHex(name);
+          return `${name.substring(0, maxLength - (hashCodeHex.length + 1))}-${hashCodeHex}`;
         }
-        return name
+        return name;
     }
 
     /**
      * Generates a ssm param name in the format of /<org>/<env>/<domain>/<module_name>
      */
-    public ssmPath ( path: string, includeModuleName: boolean = true, lowerCase: boolean = true ): string {
-        let name = `/${ this.props.org }/${ this.props.domain }`
+      public ssmPath(path: string, includeModuleName = true, lowerCase = true): string {
+        let name = `/${this.props.org}/${this.props.domain}`;
         if ( includeModuleName ) {
-            name = `${ name }/${ this.props.moduleName }`
+          name = `${name}/${this.props.moduleName}`;
         }
-        return lowerCase ? `${ name }/${ path }`.toLowerCase() : `${ name }/${ path }`
+        return lowerCase ? this.lowerCase(`${name}/${path}`) : `${name}/${path}`;
     }
 
     /**
      * Generates a export name in the format of <org>:<env>:<domain>:<module_name>
      */
-    public exportName ( path: string, includeModuleName: boolean = true, lowerCase: boolean = true ): string {
-        let name = `${ this.props.org }:${ this.props.domain }`
+      public exportName(path: string, includeModuleName = true, lowerCase = true): string {
+        let name = `${this.props.org}:${this.props.domain}`;
         if ( includeModuleName ) {
-            name = `${ name }:${ this.props.moduleName }`
+          name = `${name}:${this.props.moduleName}`;
         }
-        return lowerCase ? `${ name }:${ path }`.toLowerCase() : `${ name }:${ path }`
+        return lowerCase ? this.lowerCase(`${name}:${path}`) : `${name}:${path}`;
     }
 
     /**
      * Generates a stack name in the format of <org>-<env>-<domain>-<module_name>.
      * Sanitizes non-alpha numeric characters and replaces underscores with '-'
      */
-    public stackName ( stackNameSuffix: string ): string {
+      public stackName(stackNameSuffix?: string): string {
+        const org = MdaaDefaultResourceNaming.sanitize(this.props.org);
+        const env = MdaaDefaultResourceNaming.sanitize(this.props.env);
+        const domain = MdaaDefaultResourceNaming.sanitize(this.props.domain);
+        const module_name = MdaaDefaultResourceNaming.sanitize(this.props.moduleName);
+        const suffix = stackNameSuffix ? MdaaDefaultResourceNaming.sanitize(stackNameSuffix) : undefined;
 
-        const org = MdaaDefaultResourceNaming.sanitize( this.props.org )
-        const env = MdaaDefaultResourceNaming.sanitize( this.props.env )
-        const domain = MdaaDefaultResourceNaming.sanitize( this.props.domain )
-        const module_name = MdaaDefaultResourceNaming.sanitize( this.props.moduleName )
-        const suffix = MdaaDefaultResourceNaming.sanitize( stackNameSuffix )
-
-        let stackName = `${ org }-${ env }-${ domain }-${ module_name }`
+        let stackName = `${org}-${env}-${domain}-${module_name}`;
         if ( suffix ) {
-            stackName = `${ stackName }-${ suffix.toLowerCase() }`
+          stackName = `${stackName}-${this.lowerCase(suffix)}`;
         }
-        return stackName
+        return stackName;
     }
 
     protected static sanitize ( component: string ): string | undefined {
         if ( !component ) {
-            return component
+          return component;
         }
-        return component.replace( /^\W+$/g, '' ).replace( /_/g, '-' )
+        return component.replace(/^\W+$/g, '').replace(/_/g, '-');
     }
 
     protected static hashCodeHex ( s: string ) {
-        let h = 0
-        for ( let i = 0; i < s.length; i++ )
-            h = Math.imul( 31, h ) + s.charCodeAt( i ) | 0;
-        return h.toString( 16 );
-    }
+        let h = 0;
+        for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+            return h.toString( 16 );
+        }
+
+      protected lowerCase(input: string): string {
+        return input.toLowerCase().replace(/\{token\[token\.(\d+)\]\}/, '{Token[TOKEN.$1]}');
+      }
 }
+
 ```
 
 #### Example Extended Naming Implementation
