@@ -48,6 +48,7 @@ artifacts:
     - SECURITY.md
     - .viperlightignore
     - solution-manifest.yaml
+    - deployment/**/*
   exclude-paths:
     - '**/node_modules/**'
     - "packages/**/node_modules/"

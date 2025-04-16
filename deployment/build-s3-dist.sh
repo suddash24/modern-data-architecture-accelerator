@@ -191,10 +191,10 @@ fn_exists()
 #
 # Example:
 #
-# SOLUTION_ID='SO0111'
-# SOLUTION_NAME='AWS Security Hub Automated Response & Remediation'
-# SOLUTION_TRADEMARKEDNAME='aws-security-hub-automated-response-and-remediation'
-# SOLUTION_VERSION='v1.1.1' # optional
+# SOLUTION_ID='SO0320'
+# SOLUTION_NAME='Modern Data Architecture Accelerator'
+# SOLUTION_TRADEMARKEDNAME='modern-data-architecture-accelerator'
+# SOLUTION_VERSION='v1.0.0' # optional
 if [[ -e './solution_config' ]]; then
     source ./solution_config
 else
@@ -251,7 +251,7 @@ elif [ ! -z "$2" ]; then
 elif [ ! -z $SOLUTION_VERSION ]; then
     version=$SOLUTION_VERSION
 elif [ -e ../source/version.txt ]; then
-    version=`cat ../source/version.txt`
+    version=$(cat ../source/version.txt)
 else
     echo "Version not found. Version must be passed as an argument or in version.txt in the format vn.n.n"
     exit 1

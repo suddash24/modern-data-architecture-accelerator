@@ -67,20 +67,6 @@ fs.readdirSync(global_s3_assets).forEach(file => {
     return resources[key].Type === 'AWS::ServiceCatalog::CloudFormationProduct';
   });
 
-  serviceCatalogProducts.forEach(function (f) {
-    const productArray = template.Resources[f].Properties.ProvisioningArtifactParameters;
-    let i = 0;
-    while (productArray[i]) {
-      // Filter out the AWS GovCloud Account vending machine
-      if (productArray[i].Description.includes('AWS GovCloud (US) Account Vending Product.')) {
-        productArray[i].Info.LoadTemplateFromURL =
-          'https://s3.amazonaws.com/%%PRODUCT_BUCKET%%/%%SOLUTION_NAME%%/%%VERSION%%/AWSAccelerator-GovCloudAccountVendingProduct.template';
-        console.log(productArray[i].Info.LoadTemplateFromURL);
-        i++;
-      }
-    }
-  });
-
   // Clean-up parameters section
   const parameters = template.Parameters ? template.Parameters : {};
   const assetParameters = Object.keys(parameters).filter(function (key) {
