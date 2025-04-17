@@ -1,10 +1,26 @@
 # Change Log
 
-## [1.0.0] - 2025-04-18
+## [0.46.0] - 2025-04-17
 
-### General Availability Release
+### General Changes
 
-* Modern Data Architecture Accelerator (MDAA) released to GA status
+* Bumped CDK to latest (2.188.0)
+* Applied ESLint across codebase
+* Prepped for open source release
+* Hardened MDAA CLI to better handle errors in child processes (Lerna builds and CDK)
+* Added NodeJs version check >= 0.22 to MDAA CLI
+* Modified Lambda layer asset builds to use CDK Assets with Docker, and fall back to Pip if Docker is unavailable
+* Standardized Lambda logging
+* Added AWS Solution details to deployed CloudFormation stack descriptions
+
+### Security Changes
+
+* Modified all CDK Nag suppressions to indicate if they originate in code (with source file/line number) or from config
+
+### Governance Changes
+
+* Added SageMaker Governance module with support for SageMaker Catalog domain creation
+
 
 ## [0.45.0] - 2025-03-18
 
