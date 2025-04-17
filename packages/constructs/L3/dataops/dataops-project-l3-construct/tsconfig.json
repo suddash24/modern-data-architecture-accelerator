@@ -36,16 +36,16 @@
   ],
   "references": [
     {
-      "path": "../../../L2/construct"
-    },
-    {
-      "path": "../../governance/datazone-l3-construct"
-    },
-    {
       "path": "../../datalake/athena-workgroup-l3-construct"
     },
     {
+      "path": "../../../L2/construct"
+    },
+    {
       "path": "../../../L2/datazone-constructs"
+    },
+    {
+      "path": "../../governance/datazone-l3-construct"
     },
     {
       "path": "../../../L2/ec2-constructs"

@@ -39,6 +39,9 @@
       "path": "../../../L2/construct"
     },
     {
+      "path": "../../../L2/custom-constructs"
+    },
+    {
       "path": "../../../../utilities/iam-role-helper"
     },
     {
@@ -46,9 +49,6 @@
     },
     {
       "path": "../../core/l3-construct"
-    },
-    {
-      "path": "../../../L2/custom-constructs"
     },
     {
       "path": "../../../../utilities/mdaa-naming"
