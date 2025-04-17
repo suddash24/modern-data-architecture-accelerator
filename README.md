@@ -51,7 +51,7 @@ Additionally, once your Modern Data Architecture is deployed, you can use these 
 
 ## Logical Design
 
-MDAA is designed as a set of logical architectural layers, each constituted by a set of functional 'modules'. Each module configures and deploys a set of resources which constitute the data analytics environment. Modules may have logical dependencies on eachother, and may also leverage non-MDAA resources deployed within the environment, such as those deployed via Landing Zone Accelerator.
+MDAA is designed as a set of logical architectural layers, each constituted by a set of functional 'modules'. Each module configures and deploys a set of resources which constitute the data analytics environment. Modules may have logical dependencies on each other, and may also leverage non-MDAA resources deployed within the environment, such as those deployed via Landing Zone Accelerator.
 
 While MDAA can be used to implement a comprehensive, end to end data analytics platform, it **_does not_** result in a closed system. MDAA may be freely integrated with non-MDAA deployed platform elements and analytics capabilites. Any individual layer or module of MDAA can be replaced by a non-MDAA component, and the remaining layers/modules will continue to function (assuming basic functional parity with the replaced MDAA module/layer).
 
