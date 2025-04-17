@@ -81,13 +81,15 @@ export class MdaaInstallerStack extends cdk.Stack {
       allowedValues: ['basic_datalake', 'basic_datascience_platform'],
       default: 'basic_datalake',
     });
-    
+
     // org name
     const orgNameParam = new cdk.CfnParameter(this, 'OrgName', {
       type: 'String',
-      description: 'An MDAA deployment requires an Org Name (must start with a letter, contain only alphanumeric characters and hyphens, and be 100 characters or less)',
+      description:
+        'An MDAA deployment requires an Org Name (must start with a letter, contain only alphanumeric characters and hyphens, and be 100 characters or less)',
       allowedPattern: '^[a-zA-Z][a-zA-Z0-9-]{0,99}$',
-      constraintDescription: 'Org Name must start with a letter and contain only alphanumeric characters (case-sensitive) and hyphens. Maximum length is 100 characters.'
+      constraintDescription:
+        'Org Name must start with a letter and contain only alphanumeric characters (case-sensitive) and hyphens. Maximum length is 100 characters.',
     });
 
     // network info
@@ -100,7 +102,6 @@ export class MdaaInstallerStack extends cdk.Stack {
       type: 'String',
       description: 'The ID of the subnet to use for deployment',
     });
-
 
     // KMS Key for encryption
     const installerKey = new kms.Key(this, 'InstallerKey', {
@@ -127,9 +128,7 @@ export class MdaaInstallerStack extends cdk.Stack {
     // IAM Role for CodeBuild
     const buildRole = new iam.Role(this, 'BuildRole', {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
-      managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'),
-      ],
+      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')],
     });
 
     // CodeBuild Project
@@ -147,11 +146,7 @@ export class MdaaInstallerStack extends cdk.Stack {
             'runtime-versions': {
               nodejs: 22,
             },
-            commands: [
-              'ls -lt',
-              'npm ci',
-              'npm install -g aws-cdk'
-            ]
+            commands: ['ls -lt', 'npm ci', 'npm install -g aws-cdk'],
           },
           build: {
             commands: [
@@ -164,17 +159,17 @@ export class MdaaInstallerStack extends cdk.Stack {
               'echo "Replacing org-name place holder"',
               'echo using sample: sample_configs/${SAMPLE_NAME}/mdaa.yaml',
               "sed -i 's/<unique[- ]org[- ]name>/'\"$ORG_NAME\"'/g' sample_configs/${SAMPLE_NAME}/mdaa.yaml",
-              "find sample_configs/${SAMPLE_NAME}/ -type f \\( -name \"*.yaml\" -o -name \"*.yml\" \\) -exec sed -i 's/<your vpc id>/'\"$VPC_ID\"'/g' {} \\;",
-              "find sample_configs/${SAMPLE_NAME}/ -type f \\( -name \"*.yaml\" -o -name \"*.yml\" \\) -exec sed -i 's/<your subnet id>/'\"$SUBNET_ID\"'/g' {} \\;",
-              "find sample_configs/${SAMPLE_NAME}/ -type f \\( -name \"*.yaml\" -o -name \"*.yml\" \\) -exec sed -i 's/<data scientist user id>/'\"$ORG_NAME\"'-datascientist/g' {} \\;",
+              'find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/<your vpc id>/\'"$VPC_ID"\'/g\' {} \\;',
+              'find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/<your subnet id>/\'"$SUBNET_ID"\'/g\' {} \\;',
+              'find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/<data scientist user id>/\'"$ORG_NAME"\'-datascientist/g\' {} \\;',
               './bin/mdaa -c sample_configs/${SAMPLE_NAME}/mdaa.yaml deploy',
-              'echo "Deployment completed successfully"'
-            ]
-          }
+              'echo "Deployment completed successfully"',
+            ],
+          },
         },
         cache: {
-          paths: ['node_modules/**/*']
-        }
+          paths: ['node_modules/**/*'],
+        },
       }),
       environmentVariables: {
         REPOSITORY_SOURCE: {
@@ -216,7 +211,7 @@ export class MdaaInstallerStack extends cdk.Stack {
         SUBNET_ID: {
           type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
           value: subnetIdParam.valueAsString,
-        },        
+        },
       },
     });
 
@@ -229,16 +224,15 @@ export class MdaaInstallerStack extends cdk.Stack {
     });
 
     // Add inline policy to the role for accessing the secret
-    githubPipelineRole.addToPolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: [
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:DescribeSecret"
-      ],
-      resources: [
-        `arn:aws:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${githubTokenSecretsManagerId.valueAsString}`
-      ]
-    }));
+    githubPipelineRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['secretsmanager:GetSecretValue', 'secretsmanager:DescribeSecret'],
+        resources: [
+          `arn:aws:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${githubTokenSecretsManagerId.valueAsString}`,
+        ],
+      }),
+    );
 
     const githubPipeline = new codepipeline.Pipeline(this, 'GitHubPipeline', {
       pipelineName: 'MDAA-GitHubPipeline',
@@ -282,10 +276,8 @@ export class MdaaInstallerStack extends cdk.Stack {
     s3PipelineRole.addToPolicy(
       new iam.PolicyStatement({
         actions: ['s3:GetObject', 's3:GetObjectVersion'],
-        resources: [
-          `arn:aws:s3:::${repositoryBucketName.valueAsString}/${repositoryBucketObject.valueAsString}`,
-        ],
-      })
+        resources: [`arn:aws:s3:::${repositoryBucketName.valueAsString}/${repositoryBucketObject.valueAsString}`],
+      }),
     );
 
     const s3Pipeline = new codepipeline.Pipeline(this, 'S3Pipeline', {

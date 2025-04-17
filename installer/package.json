@@ -1,5 +1,5 @@
 {
-  "name": "mdaa-installer",
+  "name": "@aws-mdaa/installer",
   "version": "0.1.0",
   "bin": {
     "mdaa-installer": "bin/mdaa-installer.js"
@@ -8,7 +8,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "lint": "eslint --max-warnings 0 -c ../.eslintrc.json '**/*.{ts,tsx}' --ignore-pattern 'dist/*' --ignore-pattern 'node_modules/*' --ignore-pattern \"*.d.ts\" "
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
