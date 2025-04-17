@@ -108,7 +108,7 @@ MDAA is implemented as a set of compliant modules which can be deployed via a un
 
 ### Governance Modules (CDK Apps and L3 Constructs)
 
-- [**(Preview)SageMaker Unified Studio**](packages/apps/governance/sagemaker-app/README.md) - Allows SageMaker Unified Studio domainsto be deployed.
+- [**(Preview)SageMaker Catalog**](packages/apps/governance/sagemaker-app/README.md) - Allows SageMaker Catalog domains to be deployed.
 - [**(Preview)DataZone**](packages/apps/governance/datazone-app/README.md) - Allows DataZone domains and environment blueprints to be deployed.
 - [**(Preview)Macie Session**](packages/apps/governance/macie-session-app/README.md) - Allows Macie sessions to be deployed at the account level.
 - [**LakeFormation Data Lake Settings**](packages/apps/governance/lakeformation-settings-app/README.md) - Allows LF Settings to be administred using IaC.
