@@ -118,7 +118,7 @@ To deploy only the test_roles_module and test_datalake_module modules/stacks:
 <path_to_cloned_repo>/bin/mdaa deploy -m test_roles_module,test_datalake_module
 ```
 
-Any CLI params not recognized by MDAA CLI will be pushed down to the CDK/Terraform CLI. In this examle, `--no-rollback` will be pushed down to CDK:
+Any CLI params not recognized by MDAA CLI will be pushed down to the CDK/Terraform CLI. In this example, `--no-rollback` will be pushed down to CDK:
 
 ```bash
 <path_to_cloned_repo>/bin/mdaa deploy --no-rollback
