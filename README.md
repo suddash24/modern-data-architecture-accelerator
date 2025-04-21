@@ -2,9 +2,9 @@
 
 ## MDAA Overview
 
-The Modern Data Architecture Accelerator (MDAA) is designed to accelerate the implementation of a secure, compliant and fully capable Modern Data Architecture on AWS, allowing organizations of all sizes and sophsitication to quickly focus on driving business outcomes from their data while maintaining high assurance of security compliance. Specifically, organizations are enabled to rapidly solve data-driven problems using both traditional analytics, as well as using contemporary capabilities such as generative AI.
+The Modern Data Architecture Accelerator (MDAA) is designed to accelerate the implementation of a secure, compliant and fully capable Modern Data Architecture on AWS, allowing organizations of all sizes and sophistication to quickly focus on driving business outcomes from their data while maintaining high assurance of security compliance. Specifically, organizations are enabled to rapidly solve data-driven problems using both traditional analytics, as well as using contemporary capabilities such as generative AI.
 
-MDAA provides rapid deployment of all major elements of a Modern Data Architcture, such as Ingest, Persistence, Governance, DataOps, Consumption, Visual Analytics, Data Science, and AI/ML.
+MDAA provides rapid deployment of all major elements of a Modern Data Architecture, such as Ingest, Persistence, Governance, DataOps, Consumption, Visual Analytics, Data Science, and AI/ML.
 Additionally, MDAA has been designed to enable compliance with AWS Solutions, NIST 800-53 Rev5 (US), HIPAA, PCI-DSS CDK Nag Rulesets, as well as ITSG-33 (Canada) security control requirements. Terraform modules are compliant with standard Checkov security policies. This combination of integral compliance and broad, configuration-driven capability allows for rapid design and deployment of simple to complex data analytics environments--including Lake House and Data Mesh architectures--while minimizing security compliance risks.
 
 ## Target Usage
@@ -53,7 +53,7 @@ Additionally, once your Modern Data Architecture is deployed, you can use these 
 
 MDAA is designed as a set of logical architectural layers, each constituted by a set of functional 'modules'. Each module configures and deploys a set of resources which constitute the data analytics environment. Modules may have logical dependencies on each other, and may also leverage non-MDAA resources deployed within the environment, such as those deployed via Landing Zone Accelerator.
 
-While MDAA can be used to implement a comprehensive, end to end data analytics platform, it **_does not_** result in a closed system. MDAA may be freely integrated with non-MDAA deployed platform elements and analytics capabilites. Any individual layer or module of MDAA can be replaced by a non-MDAA component, and the remaining layers/modules will continue to function (assuming basic functional parity with the replaced MDAA module/layer).
+While MDAA can be used to implement a comprehensive, end to end data analytics platform, it **_does not_** result in a closed system. MDAA may be freely integrated with non-MDAA deployed platform elements and analytics capabilities. Any individual layer or module of MDAA can be replaced by a non-MDAA component, and the remaining layers/modules will continue to function (assuming basic functional parity with the replaced MDAA module/layer).
 
 MDAA is conceptually, architecturally, and technically similar in nature to the Landing Zone Accelerator (LZA), providing similar functionality for analytics platform configuration and deployment as LZA does for general cloud platform configuration and deployment. The logical layers of MDAA are specifically designed to be deployed on top of a general purpose, secure cloud platform such as that deployed by LZA.
 
@@ -92,13 +92,13 @@ See [MDAA Security](SECURITY.md)
 
 MDAA is implemented as a set of compliant modules which can be deployed via a unified Deployment/Orchestration layer.
 
-- **MDAA CDK Modules** - A set of configuration-driven CDK Apps, which leverage the MDAA CDK Constructs in order to define and deploy compliant data analytics environment components as CloudFormation stacks. These apps can be executed directly and independantly using CDK cli, or composed and orchestrated via the MDAA CLI.
+- **MDAA CDK Modules** - A set of configuration-driven CDK Apps, which leverage the MDAA CDK Constructs in order to define and deploy compliant data analytics environment components as CloudFormation stacks. These apps can be executed directly and independently using CDK cli, or composed and orchestrated via the MDAA CLI.
 
-- **MDAA Terraform Modules (Preview)** - A set of standardized Terraform modules which adhere to security control requirements. These apps can be executed directly and independantly using Terraform cli, or composed and orchestrated via the MDAA CLI. Note that Terraform integration is currently in preview, and not all MDAA functionality is available.
+- **MDAA Terraform Modules (Preview)** - A set of standardized Terraform modules which adhere to security control requirements. These apps can be executed directly and independently using Terraform cli, or composed and orchestrated via the MDAA CLI. Note that Terraform integration is currently in preview, and not all MDAA functionality is available.
 
-- **MDAA CDK L2 and L3 Constructs** - A set of reusable CDK constructs which are leveraged by the rest of the MDAA codebase, but can also be reused to build additional compliant CDK constructs, stacks, or apps. These constructs are each designed for compliance with AWS Solutions, HIPAA, PCI-DSS and NIST 800-53 R5 CDK Nag rulesets. Similar to the CDK codebase MDAA is built on, MDAA constructs are available with binding for multiple langauges, currently including TypeScript/Node.js and Python 3.
+- **MDAA CDK L2 and L3 Constructs** - A set of reusable CDK constructs which are leveraged by the rest of the MDAA codebase, but can also be reused to build additional compliant CDK constructs, stacks, or apps. These constructs are each designed for compliance with AWS Solutions, HIPAA, PCI-DSS and NIST 800-53 R5 CDK Nag rulesets. Similar to the CDK codebase MDAA is built on, MDAA constructs are available with binding for multiple languages, currently including TypeScript/Node.js and Python 3.
 
-- **MDAA CLI (Deployement/Orchestration) App** - A configuration driven CLI application which allows for composition and orchestration of multiple MDAA Modules (CDK and Terraform) in order to deploy a compliant end to end data analytics environment. Also ensures that each MDAA Module is deployed with the specified configuration into the specified accounts while also accounting for dependencies between modules.
+- **MDAA CLI (Deployment/Orchestration) App** - A configuration driven CLI application which allows for composition and orchestration of multiple MDAA Modules (CDK and Terraform) in order to deploy a compliant end to end data analytics environment. Also ensures that each MDAA Module is deployed with the specified configuration into the specified accounts while also accounting for dependencies between modules.
 
 ![MDAA Code Architecture](docs/MDAA-Code-Architecture.png)
 
@@ -111,7 +111,7 @@ MDAA is implemented as a set of compliant modules which can be deployed via a un
 - [**(Preview)SageMaker Catalog**](packages/apps/governance/sagemaker-app/README.md) - Allows SageMaker Catalog domains to be deployed.
 - [**(Preview)DataZone**](packages/apps/governance/datazone-app/README.md) - Allows DataZone domains and environment blueprints to be deployed.
 - [**(Preview)Macie Session**](packages/apps/governance/macie-session-app/README.md) - Allows Macie sessions to be deployed at the account level.
-- [**LakeFormation Data Lake Settings**](packages/apps/governance/lakeformation-settings-app/README.md) - Allows LF Settings to be administred using IaC.
+- [**LakeFormation Data Lake Settings**](packages/apps/governance/lakeformation-settings-app/README.md) - Allows LF Settings to be administered using IaC.
 - [**LakeFormation Access Controls**](packages/apps/governance/lakeformation-access-control-app/README.md) - Allows LF Access Controls to be administered using IaC
 - [**Glue Catalog**](packages/apps/governance/glue-catalog-app/README.md) - Configures the Encryption at Rest settings for Glue Catalog at the account level. Additionally, configures Glue catalogs for cross account access required by a Data Mesh architecture.
 - [**IAM Roles and Policies**](packages/apps/governance/roles-app/README.md) - Generates IAM roles for use within the Data Environment
@@ -132,7 +132,7 @@ MDAA is implemented as a set of compliant modules which can be deployed via a un
 - [**Data Ops Workflows**](packages/apps/dataops/dataops-workflow-app/README.md) - Generates Glue workflows for orchestrating Data Ops pipelines
 - [**Data Ops Step Functions**](packages/apps/dataops/dataops-stepfunction-app/README.md) - Generates Step Functions for orchestrating Data Ops pipelines
 - [**Data Ops Lambda**](packages/apps/dataops/dataops-lambda-app/README.md) - Deploys Lambda functions for reacting to data events and performing smaller scale data processing
-- [**Data Ops DataBrew**](packages/apps/dataops/dataops-databrew-app/README.md) - Generates Glue DataBrew resources (Jobs, Recipicees) for performing data profiling and cleansing
+- [**Data Ops DataBrew**](packages/apps/dataops/dataops-databrew-app/README.md) - Generates Glue DataBrew resources (Jobs, Recipes) for performing data profiling and cleansing
 - [**(Preview) Data Ops Nifi**](packages/apps/dataops/dataops-nifi-app/README.md) - Generates Apache Nifi clusters for building event-driven data flows
 - [**(Preview) Data Ops Database Migration Service (DMS)**](packages/apps/dataops/dataops-dms-app/README.md) - Generates DMS Replication Instances, Endpoints, and Tasks
 
@@ -156,7 +156,7 @@ MDAA is implemented as a set of compliant modules which can be deployed via a un
 - [**SFTP Transfer Family Server**](packages/apps/utility/sftp-server-app/README.md) - Deploys SFTP Transfer Family service for loading data into the Data Lake
 - [**SFTP Transfer Family User Administrator**](packages/apps/utility/sftp-users-app/README.md) - Allows SFTP Transfer Family users to be administered in IaC
 - [**DataSync**](packages/apps/utility/datasync-app/README.md) - Deploys DataSync resources for data movement service between on-premises storage systems and cloud-based storage services
-- [**EventBridge**](packages/apps/utility/eventbridge-app/README.md) - Deploys EventBridge resoruces such as EventBuses
+- [**EventBridge**](packages/apps/utility/eventbridge-app/README.md) - Deploys EventBridge resources such as EventBuses
 
 ---
 
@@ -196,7 +196,7 @@ These modules are specifically designed to be compliant with standard Checkov ru
 - DataOps Glue Crawlers
 - DataOps Glue Jobs
 - DataOps Glue Workflow
-- DataOps Projecs
+- DataOps Projects
 
 ---
 
@@ -220,9 +220,9 @@ MDAA can be used and extended in the following ways:
   - High compliance assurance for resources deployed via MDAA constructs
 
 - Custom-developed and deployed data-driven applications/workloads can be configured to leverage MDAA-deployed resources via the standard set of SSM params which are published by all MDAA modules
-  - Independantly developed in Terraform, CDK or CFN
+  - Independently developed in Terraform, CDK or CFN
   - Loosely coupled with MDAA via SSM Params
-  - Workload/Application compliance independantly validated
+  - Workload/Application compliance independently validated
 
 ![MDAA Usage and Extension](docs/MDAA-Extending.png)
 

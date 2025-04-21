@@ -9,7 +9,7 @@ MDAA is designed to deploy data environments across multiple domains and environ
 * **Domain** - A data environment can be organized into one or more *domains*, which may align to organizational units such as line of business, directorate, etc. Domains may be spread across one or more accounts. When spread across multiple accounts, each domain becomes a potential node in a data mesh architecture.
 * **Environment** - An domain can be deployed across multiple *environments* (such as DEV/TEST/PROD). Each environment may deployed in a separate account.
 * **Module** - A *module* specifies which CDK App and corresponding configuration will be deployed within an data environment domain/environment. During deployment, modules will be deployed in stages according to dependencies between modules.
-* **CDK App** - A *CDK App* is built, executed, and deployed using the AWS CDK framework. The CDK app will be forked from the MDAA orchestrator and executed as a regular CDK application. Each CDK produces one or more CloudFormation stacks, which in turn deploy the cloud resources which will constitute the data environment. Alternatively, instead of deploying resources directly to the envioronment, they can instead be published as Service Catalog products, to be deployed on a self-service basis by users within the accounts.
+* **CDK App** - A *CDK App* is built, executed, and deployed using the AWS CDK framework. The CDK app will be forked from the MDAA orchestrator and executed as a regular CDK application. Each CDK produces one or more CloudFormation stacks, which in turn deploy the cloud resources which will constitute the data environment. Alternatively, instead of deploying resources directly to the environment, they can instead be published as Service Catalog products, to be deployed on a self-service basis by users within the accounts.
 
 ### Direct Configuration and Deployment
 
@@ -141,7 +141,7 @@ tag_configs:
 organization: sample-org
 
 # Additional context keys can be specified globally, per domain, per env, or per module.
-# Values specified lower in the heirarcy (Ie module) will override values specifified higher (Ie global)
+# Values specified lower in the hierarchy (Ie module) will override values specified higher (Ie global)
 # Context values can be referenced in MDAA CDK App configs using the "{{context:<key>}} syntax".
 # For example (from Audit CDK Aoo Config):
 # readRoles:
@@ -243,7 +243,7 @@ domains:
             module_configs:
               - ./shared/athena-workgroup.yaml
             # App config data can also be directly specified in the mdaa.yaml
-            # Config data specified in the mdaa.yaml will supercede the contents of the 
+            # Config data specified in the mdaa.yaml will supersede the contents of the 
             # individual module config files where conflicts occur. Otherwise,
             # all config data will be merged before being parsed by the module/CDK App.
             module_config_data:
@@ -251,7 +251,7 @@ domains:
             tag_configs: # Additional tag configs can be specified at the module level
               - module_tags.yaml
             # Tag config data can also be directly specified in the mdaa.yaml
-            # Tag data specified in the mdaa.yaml will supercede the contents of the 
+            # Tag data specified in the mdaa.yaml will supersede the contents of the 
             # individual tag config files where conflicts occur. Otherwise,
             # all tag data will be merged before being parsed by the module/CDK App.
             tag_config_data:
@@ -315,11 +315,11 @@ domains:
             service_catalog_product_config:
               name: Example Notebook Product
               owner: Test Owner
-              portfolio_arn: some_portfilio_arn
+              portfolio_arn: some_portfolio_arn
             module_configs:
               - ./datascience_domain/sm-notebook.yaml
 
-  # Exmple of a domain which uses globally templated environments
+  # Example of a domain which uses globally templated environments
   globally-templated-domain1: 
     environments:
       # Example of envs that uses a global environment template
@@ -331,7 +331,7 @@ domains:
         template: example_global_env_template
 
 
-  # Exmple of a second domain which uses globally templated environments
+  # Example of a second domain which uses globally templated environments
   globally-templated-domain2: 
     environments:
       # Example of an env that uses a global environment template
