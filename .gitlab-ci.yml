@@ -74,7 +74,10 @@ feature_merge_lint:
   variables:
     AWS_CREDS_TARGET_ROLE: "${DEV_ROLE_ARN}"
   script:
+    - echo "Running npm_install.sh script"
     - ./scripts/npm_install.sh
+    - echo "Completed npm_install.sh"
+    - echo "Executing lint.sh script"
     - ./scripts/lint.sh
 
 feature_merge_main:
