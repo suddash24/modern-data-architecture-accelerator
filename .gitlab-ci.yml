@@ -480,7 +480,7 @@ prerelease_generate_html_docs:
     - prerelease_analyze
   allow_failure: false
   script:
-    - ./scripts/generate_docs.sh docs_prerelease
+    - ./scripts/generate_docs.sh docs_prerelease gitlab
 
 prerelease_publish_npm:
   tags:
@@ -851,8 +851,8 @@ release_generate_html_docs:
     - prerelease_analyze
   allow_failure: false
   script:
-    - ./scripts/generate_docs.sh docs_prerelease
-    - ./scripts/generate_docs.sh docs_release
+    - ./scripts/generate_docs.sh docs_prerelease gitlab
+    - ./scripts/generate_docs.sh docs_release gitlab
 
 prerelease_push_git:
   tags:
