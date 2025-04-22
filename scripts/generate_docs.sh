@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 DOCS_BRANCH=$1
+DEPLOY_TARGET=$2  # Expected values: 'github' or 'gitlab'
 
 export CURRENT_VERSION=$(jq -r .version < lerna.json)
 export CURRENT_MAJOR=$(cut -d'.' -f1 <<<"$CURRENT_VERSION")
@@ -15,20 +16,59 @@ rm -rf target/docs*;mkdir -p target/docs/
 # Generate Config Schema Docs
 # Generate CLI Schema Doc
 generate-schema-doc --config-file ./scripts/jsfh-conf.yaml ./packages/cli/lib/config-schema.json ./packages/cli/SCHEMA.md
+
 # Generate Module Schema Docs
 find ./packages/apps/ -name config-schema.json -execdir generate-schema-doc --config-file ../../../../../scripts/jsfh-conf.yaml {} ../SCHEMA.md ';'
 
 # Generate TypeDocs
 npx typedoc --out target/docs/typedocs/
 
-# Copy all markdown and doc png images to target/docs dir (mkdocs needs everything in one spot)
+# Copy all markdown and doc png images to target/docs dir (mkdocs needs everything in one spot)
 rsync -zarvm --exclude="*node_modules*" --exclude="*coverage*" --include="*/" --include="*.md" --include="*.png" --include="*.css" --include=".pages" --include="*.yaml" --include="*.tf" --exclude="*" . target/docs/
 
-# Setup a remote which will be used to push docs to the separate CAEF Docs repo (using mike/mkdocs)
-git remote add docs_publish "https://gitlab-ci-token:$CI_GROUP_TOKEN@$CI_SERVER_HOST/$CAEF_DOCS_PROJECT_PATH.git/"
-git fetch docs_publish
+# Function to deploy to GitLab Pages
+deploy_gitlab() {
+    if [ -z "$CI_GROUP_TOKEN" ] || [ -z "$CI_SERVER_HOST" ] || [ -z "$CAEF_DOCS_PROJECT_PATH" ]; then
+        echo "Error: Required GitLab CI variables are not set"
+        exit 1
+    fi
+    
+    # Setup GitLab remote
+    git remote add docs_publish "https://gitlab-ci-token:$CI_GROUP_TOKEN@$CI_SERVER_HOST/$CAEF_DOCS_PROJECT_PATH.git/"
+    git fetch docs_publish
 
-# Use mkdocs/mike to compile the documentation into HTML 
-mike deploy -u -r docs_publish -b $DOCS_BRANCH $PUBLISHED_VERSION latest --push
-mike set-default $PUBLISHED_VERSION -r docs_publish -b $DOCS_BRANCH --push
-git remote remove docs_publish
+    # Deploy using mike for GitLab
+    mike deploy -u -r docs_publish -b "$DOCS_BRANCH" "$PUBLISHED_VERSION" latest --push
+    mike set-default "$PUBLISHED_VERSION" -r docs_publish -b "$DOCS_BRANCH" --push
+    
+    # Cleanup
+    git remote remove docs_publish
+}
+
+# Function to deploy to GitHub Pages
+deploy_github() {
+    if [ -z "$GITHUB_TOKEN" ]; then
+        echo "Error: GITHUB_TOKEN is not set"
+        exit 1
+    fi
+
+    # Deploy using mike for GitHub
+    mike deploy --push --update-aliases "$PUBLISHED_VERSION" latest
+    mike set-default --push "$PUBLISHED_VERSION"
+}
+
+# Main deployment logic
+case "$DEPLOY_TARGET" in
+    "gitlab")
+        echo "Deploying to GitLab Pages..."
+        deploy_gitlab
+        ;;
+    "github")
+        echo "Deploying to GitHub Pages..."
+        deploy_github
+        ;;
+    *)
+        echo "Error: Invalid deployment target. Use 'github' or 'gitlab'"
+        exit 1
+        ;;
+esac
