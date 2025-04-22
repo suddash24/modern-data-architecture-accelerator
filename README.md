@@ -146,9 +146,10 @@ MDAA is implemented as a set of compliant modules which can be deployed via a un
 
 ### AI/Data Science Modules (CDK Apps and L3 Constructs)
 
-- [**SageMaker Studio Domain**](packages/apps/datascience/sm-studio-domain-app/README.md) - Deploys secured SageMaker Studio Domain
-- [**SageMaker Notebooks**](packages/apps/datascience/sm-notebook-app/README.md) - Deploys secured SageMaker Notebooks
-- [**Data Science Team/Project**](packages/apps/datascience/data-science-team-app/README.md) - Deploys resource to support a team's Data Science activities
+- [**SageMaker Studio Domain**](packages/apps/ai/sm-studio-domain-app/README.md) - Deploys secured SageMaker Studio Domain
+- [**SageMaker Notebooks**](packages/apps/ai/sm-notebook-app/README.md) - Deploys secured SageMaker Notebooks
+- [**Data Science Team/Project**](packages/apps/ai/data-science-team-app/README.md) - Deploys resource to support a team's Data Science activities
+- [**Generative AI Accelerator**](packages/apps/ai/gaia-app/README.md) - Deploys resources for an authenticated GenAI-powered ChatBot 
 
 ### Core/Utility Modules (CDK Apps and L3 Constructs)
 
