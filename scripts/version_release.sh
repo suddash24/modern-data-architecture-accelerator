@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-rm package-lock.json
+
 echo "Running release versioning script."
 
 #Increment version using lerna
