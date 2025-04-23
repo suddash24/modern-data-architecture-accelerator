@@ -55,6 +55,7 @@ viperlight_postbuild:
 image: $CAEF_BUILD_IMAGE
 
 variables:
+  VERSION_BUMP_LEVEL: minor
   GIT_SUBMODULE_STRATEGY: recursive
 
 before_script:
