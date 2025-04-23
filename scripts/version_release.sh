@@ -2,8 +2,6 @@
 set -e
 
 echo "Running release versioning script."
-# Remove package-lock because all of our package versions are changing and it will need to be updated by next npm install
-rm package-lock.json
 
 #Increment version using lerna
 export CURRENT_VERSION=$(jq -r .version < lerna.json )
