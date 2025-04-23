@@ -596,7 +596,7 @@ release_version_package:
   only:
     refs:
       - main
-  stage: prerelease
+  stage: pre-release
   cache:
     key: release-$CI_COMMIT_SHA
     paths:
