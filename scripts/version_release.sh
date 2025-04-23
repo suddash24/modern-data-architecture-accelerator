@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-
+rm package-lock.json
 echo "Running release versioning script."
 
 #Increment version using lerna
@@ -17,5 +17,5 @@ find ./packages -type f -name ".jsii" | grep -v node_modules | xargs -n1 -I{} se
 find ./packages -type f -name "package.json" | grep -v node_modules | xargs -n1 -I{} sed -i  "s/@aws-mdaa\(.*\)\"\(.*\)$CURRENT_VERSION\"/@aws-mdaa\1\"\2$NEW_VERSION\"/" {}
 sed -i  "s/@aws-mdaa\(.*\)\"\(.*\)$CURRENT_VERSION\"/@aws-mdaa\1\"\2$NEW_VERSION\"/" ./schemas/package.json
 
-
+npm install
 

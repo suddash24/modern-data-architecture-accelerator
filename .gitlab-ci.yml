@@ -624,7 +624,6 @@ release_version_package:
     - ./scripts/git_secrets.sh
     - ./scripts/npm_install.sh
     - ./scripts/version_release.sh
-    - ./scripts/npm_install.sh
     - ./scripts/build_test.sh
     - ./scripts/package.sh
 
