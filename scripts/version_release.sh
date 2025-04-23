@@ -1,7 +1,14 @@
 #!/bin/bash
 set -e
 
+if [[ -z "${VERSION_BUMP_LEVEL}" ]]; then
+  echo "VERSION_BUMP_LEVEL is not set or is empty."
+  exit 1
+else
+
 echo "Running release versioning script."
+# Remove package-lock because all of our package versions are changing and it will need to be updated by next npm install
+rm package-lock.json
 
 #Increment version using lerna
 export CURRENT_VERSION=$(jq -r .version < lerna.json )
