@@ -12,8 +12,6 @@ export NEW_VERSION="${CURRENT_MAJOR}.${CURRENT_MINOR}.${EPOCH}"
 
 echo "Updating version from $CURRENT_VERSION -> $NEW_VERSION"
 
-rm package-lock.json
-
 # Update version in lerna.json
 sed -i "s/\"version\": \"${CURRENT_VERSION}\"/\"version\": \"${NEW_VERSION}\"/" lerna.json
 
