@@ -24,7 +24,10 @@ find ./packages/apps/ -name config-schema.json -execdir generate-schema-doc --co
 npx typedoc --out target/docs/typedocs/
 
 # Copy all markdown and doc png images to target/docs dir (mkdocs needs everything in one spot)
-rsync -zarvm --exclude="*node_modules*" --exclude="*coverage*" --include="*/" --include="*.md" --include="*.png" --include="*.css" --include=".pages" --include="*.yaml" --include="*.tf" --exclude="*" . target/docs/
+rsync -zarvm --exclude="*node_modules*" --exclude="*coverage*" --include="*/" --include="*.md" --include="*.png" --include="*.css" --include=".pages" --include="*.yaml" --include="*.yml" --include="*.tf" --exclude="*" . target/docs/
+
+# Build using mkdocs from root directory
+mkdocs build --config-file mkdocs.yml --site-dir target/docs_site
 
 # Function to deploy to GitLab Pages
 deploy_gitlab() {
@@ -47,14 +50,10 @@ deploy_gitlab() {
 
 # Function to deploy to GitHub Pages
 deploy_github() {
-    if [ -z "$GITHUB_TOKEN" ]; then
-        echo "Error: GITHUB_TOKEN is not set"
-        exit 1
-    fi
+    # No mike commands needed for GitHub Pages
+    # The actions/deploy-pages action will handle the deployment
 
-    # Deploy using mike for GitHub
-    mike deploy --push --update-aliases "$PUBLISHED_VERSION" latest
-    mike set-default --push "$PUBLISHED_VERSION"
+    echo "Documentation built successfully for GitHub Pages deployment"
 }
 
 # Main deployment logic
