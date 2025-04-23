@@ -28,47 +28,50 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
         run: |
+          pip install \
+            mkdocs-material \
+            mike \
+            mdx_truly_sane_lists \
+            mkdocs-awesome-pages-plugin \
+            pymdown-extensions \
+            json-schema-for-humans
           npm ci
-          npm install -g json-schema-for-humans typedoc mkdocs-material mike
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install Python dependencies
-        run: |
-          pip install mkdocs mkdocs-material
+          npm install -g typedoc
 
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
+      - name: Build MDAA
+        run: |
+          lerna run build
+
       - name: Generate documentation
         run: |
           chmod +x ./scripts/generate_docs.sh
           ./scripts/generate_docs.sh gh-pages github
-        env:
-          NODE_ENV: production
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './target/docs'
+          path: './target/docs_site'
 
   deploy:
     environment:
