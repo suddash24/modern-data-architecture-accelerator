@@ -583,7 +583,6 @@ prerelease_publish_s3:
 
 release_version_package:
   when: manual
-  manual_confirmation: "Are you sure you want release a $VERSION_BUMP_LEVEL version?"
   environment: release
   tags:
     - arch:amd64
@@ -627,6 +626,28 @@ release_version_package:
     - ./scripts/build_test.sh
     - ./scripts/package.sh
 
+release:
+  tags:
+    - arch:amd64
+    - size:small
+  environment: release
+  when: manual
+  manual_confirmation: "Are you sure you want release a $VERSION_BUMP_LEVEL version?"
+  except:
+    variables:
+      - $GITLAB_USER_NAME == "CI_GROUP_TOKEN"
+    refs:
+      - tags
+  only:
+    refs:
+      - main
+  stage: pre_release
+  needs:
+    - release_version_package
+  allow_failure: false
+  script:
+    - echo "Releasing "
+
 # Publishes latest release version back to prerelease
 release_publish_npm_prerelease:
   tags:
@@ -661,6 +682,7 @@ release_publish_npm_prerelease:
   dependencies:
     - release_version_package
   needs:
+    - release
     - release_version_package
     - prerelease_analyze
   allow_failure: false
@@ -703,6 +725,7 @@ release_publish_npm:
   dependencies:
     - release_version_package
   needs:
+    - release
     - release_version_package
     - prerelease_analyze
   allow_failure: false
@@ -745,6 +768,7 @@ release_publish_pip:
   dependencies:
     - release_version_package
   needs:
+    - release
     - release_version_package
     - prerelease_analyze
   allow_failure: false
@@ -787,6 +811,7 @@ release_publish_s3:
   dependencies:
     - release_version_package
   needs:
+    - release
     - release_version_package
     - prerelease_analyze
   allow_failure: false
@@ -824,6 +849,7 @@ release_generate_html_docs:
   dependencies:
     - release_version_package
   needs:
+    - release
     - release_version_package
     - prerelease_analyze
   allow_failure: false
@@ -865,6 +891,7 @@ prerelease_push_git:
   dependencies:
     - release_version_package
   needs:
+    - release
     - release_version_package
     - release_publish_s3
     - release_publish_pip
@@ -910,6 +937,7 @@ release_push_git:
   dependencies:
     - release_version_package
   needs:
+    - release
     - release_version_package
     - release_publish_s3
     - release_publish_pip
