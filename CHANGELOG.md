@@ -4,7 +4,7 @@
 
 ### General Changes
 
-- Bumped CDK to latest (2.189.0)
+- Bumped CDK to latest (2.190.0)
 - Fixed issue with platform-specific NX libraries limiting portability
 
 ## [0.46.0] - 2025-04-17
