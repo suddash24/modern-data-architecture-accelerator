@@ -615,8 +615,6 @@ release_version_package:
     exclude:
       - "**/node_modules/**"
   allow_failure: false
-  needs:
-    - prerelease_analyze
   variables:
     AWS_CREDS_TARGET_ROLE: "${DEV_ROLE_ARN}"
   script:
