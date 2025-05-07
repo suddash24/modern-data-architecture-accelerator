@@ -16,6 +16,7 @@ import { CreateAuroraWorkspace } from './create-aurora-workspace';
 import { MdaaNagSuppressions } from '@aws-mdaa/construct'; //NOSONAR
 import { MdaaKmsKey } from '@aws-mdaa/kms-constructs';
 import { MdaaSecurityGroup } from '@aws-mdaa/ec2-constructs';
+import { Duration } from 'aws-cdk-lib';
 
 export interface AuroraPgVectorProps extends MdaaL3ConstructProps {
   readonly config: SystemConfig;
@@ -122,6 +123,7 @@ export class AuroraPgVector extends MdaaL3Construct {
       createOutputs: false,
       resourceType: 'DatabaseSetupFunction',
       runtime: props.shared.pythonRuntime,
+      handlerTimeout: Duration.minutes(10),
     });
     MdaaNagSuppressions.addCodeResourceSuppressions(
       dbSetupResource,
