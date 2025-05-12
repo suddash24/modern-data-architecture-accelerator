@@ -44,3 +44,5 @@ gaia:
     dataSubnets:
       - "{{resolve:ssm:/path/to/data-subnet-1}}"
       - "{{resolve:ssm:/path/to/data-subnet-2}}"
+    createVpcEndpoints: true
+    cidrBlock: "10.0.0.0/16"

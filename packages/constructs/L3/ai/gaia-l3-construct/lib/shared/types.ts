@@ -65,6 +65,8 @@ export interface VpcProps {
   readonly dataSecurityGroupId: string;
   readonly appSubnets: string[];
   readonly appSecurityGroupId: string;
+  readonly createVpcEndpoints?: boolean;
+  readonly cidrBlock?: string;
 }
 
 export interface CodeOverwritesProps {

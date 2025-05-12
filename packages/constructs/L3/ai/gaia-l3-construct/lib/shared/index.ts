@@ -14,6 +14,7 @@ import { Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { MdaaLambdaFunction } from '@aws-mdaa/lambda-constructs';
 import { MdaaNagSuppressions } from '@aws-mdaa/construct'; //NOSONAR
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { VpcEndpoints } from './vpc-endpoints';
 
 const pythonRuntime = lambda.Runtime.PYTHON_3_12;
 const lambdaArchitecture = lambda.Architecture.X86_64;
@@ -53,7 +54,8 @@ export class Shared extends Construct {
 
     const vpc: ec2.IVpc = ec2.Vpc.fromVpcAttributes(this, 'VPC', {
       vpcId: props.config.vpc.vpcId,
-      availabilityZones: [''],
+      availabilityZones: cdk.Stack.of(this).availabilityZones,
+      vpcCidrBlock: props.config.vpc.cidrBlock || '10.0.0.0/16', // Default CIDR if not provided
     });
 
     this.appSubnets = props.config.vpc.appSubnets.map(appSubnetId => {
@@ -79,6 +81,17 @@ export class Shared extends Construct {
       'DefaultDataSecurityGroup',
       props.config.vpc.dataSecurityGroupId,
     );
+
+    // Create VPC Endpoints if configured
+    if (props.config.vpc.createVpcEndpoints) {
+      new VpcEndpoints(this, 'VpcEndpoints', {
+        config: props.config,
+        vpc: vpc,
+        securityGroups: [this.appSecurityGroup],
+        subnets: this.appSubnets,
+        naming: props.naming,
+      });
+    }
 
     const configParameter = new ssm.StringParameter(this, 'Config', {
       stringValue: JSON.stringify(props.config),

@@ -839,6 +839,12 @@
                     },
                     "type": "array"
                 },
+                "createVpcEndpoints": {
+                    "type": "boolean"
+                },
+                "cidrBlock": {
+                    "type": "string"
+                },
                 "dataSecurityGroupId": {
                     "type": "string"
                 },
