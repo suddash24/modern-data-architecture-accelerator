@@ -16,7 +16,7 @@ export enum RepositorySources {
 export enum ConfigTypes {
   BASIC_DATALAKE = 'basic_datalake',
   BASIC_DATASCIENCE = 'basic_datascience_platform',
-  BASIC_GAIA = 'basic_generative_ai_platform',
+  BASIC_GAIA = 'basic_gaia',
 }
 
 export class MdaaInstallerStack extends cdk.Stack {
@@ -69,7 +69,7 @@ export class MdaaInstallerStack extends cdk.Stack {
     });
 
     const codeConnectArn = new cdk.CfnParameter(this, 'CodeConnectArn', {
-      type: 'AWS::CodeConnections::Connection',
+      type: 'String',
       description:
         'ARN of the CodeConnect connection to GitHub (Required for GitHub). Head over to the CodePipeline->Settings->Connections to create one',
       constraintDescription: 'CodeConnect ARN is required when GitHub is selected as the repository source',
@@ -361,29 +361,45 @@ export class MdaaInstallerStack extends cdk.Stack {
               'find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/<your subnet id>/\'"$SUBNET_ID"\'/g\' {} \\;',
               'find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/<data scientist user id>/\'"$ORG_NAME"\'-datascientist/g\' {} \\;',
               // Add commands for GenAI platform parameters
-              'if [ "$SAMPLE_NAME" = "basic_generative_ai_platform" ]; then',
-              '  echo "Configuring GenAI platform with the provided network resources"',
-              '  # Extract app subnets',
-              '  IFS="," read -ra APP_SUBNET_ARRAY <<< "$APP_SUBNETS"',
-              '  if [ ${#APP_SUBNET_ARRAY[@]} -lt 2 ]; then',
-              '    echo "Error: At least 2 app subnets are required for GenAI platform"',
-              '    exit 1',
-              '  fi',
-              '  # Extract data subnets',
-              '  IFS="," read -ra DATA_SUBNET_ARRAY <<< "$DATA_SUBNETS"',
-              '  if [ ${#DATA_SUBNET_ARRAY[@]} -lt 2 ]; then',
-              '    echo "Error: At least 2 data subnets are required for GenAI platform"',
-              '    exit 1',
-              '  fi',
-              '  # Replace placeholders in app.yaml',
-              '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{VPC_ID}}/\'"$VPC_ID"\'/g\' {} \\;',
-              '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{APP_SECURITY_GROUP_ID}}/\'"$APP_SECURITY_GROUP_ID"\'/g\' {} \\;',
-              '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{DATA_SECURITY_GROUP_ID}}/\'"$DATA_SECURITY_GROUP_ID"\'/g\' {} \\;',
-              '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{APP_SUBNET_1}}/\'"${APP_SUBNET_ARRAY[0]}"\'/g\' {} \\;',
-              '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{APP_SUBNET_2}}/\'"${APP_SUBNET_ARRAY[1]}"\'/g\' {} \\;',
-              '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{DATA_SUBNET_1}}/\'"${DATA_SUBNET_ARRAY[0]}"\'/g\' {} \\;',
-              '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{DATA_SUBNET_2}}/\'"${DATA_SUBNET_ARRAY[1]}"\'/g\' {} \\;',
-              'fi',
+              'bash -c \'if [ "$SAMPLE_NAME" = "basic_gaia" ]; then\n' +
+                '  echo "Configuring GenAI platform with the provided network resources"\n' +
+                '  # Debug information\n' +
+                '  echo "APP_SUBNETS: $APP_SUBNETS"\n' +
+                '  echo "DATA_SUBNETS: $DATA_SUBNETS"\n' +
+                '  # Check if APP_SUBNETS and DATA_SUBNETS are set\n' +
+                '  if [ -z "$APP_SUBNETS" ] || [ -z "$DATA_SUBNETS" ]; then\n' +
+                '    echo "Error: APP_SUBNETS and DATA_SUBNETS must be provided for GenAI platform"\n' +
+                '    exit 1\n' +
+                '  fi\n' +
+                '  # Extract app subnets safely\n' +
+                '  APP_SUBNET_ARRAY=()\n' +
+                '  if [ ! -z "$APP_SUBNETS" ]; then\n' +
+                '    IFS="," read -ra APP_SUBNET_ARRAY <<< "$APP_SUBNETS" || true\n' +
+                '  fi\n' +
+                '  echo "Number of app subnets: ${#APP_SUBNET_ARRAY[@]}"\n' +
+                '  if [ ${#APP_SUBNET_ARRAY[@]} -lt 2 ]; then\n' +
+                '    echo "Error: At least 2 app subnets are required for GenAI platform"\n' +
+                '    exit 1\n' +
+                '  fi\n' +
+                '  # Extract data subnets safely\n' +
+                '  DATA_SUBNET_ARRAY=()\n' +
+                '  if [ ! -z "$DATA_SUBNETS" ]; then\n' +
+                '    IFS="," read -ra DATA_SUBNET_ARRAY <<< "$DATA_SUBNETS" || true\n' +
+                '  fi\n' +
+                '  echo "Number of data subnets: ${#DATA_SUBNET_ARRAY[@]}"\n' +
+                '  if [ ${#DATA_SUBNET_ARRAY[@]} -lt 2 ]; then\n' +
+                '    echo "Error: At least 2 data subnets are required for GenAI platform"\n' +
+                '    exit 1\n' +
+                '  fi\n' +
+                '  # Replace placeholders in app.yaml\n' +
+                '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{VPC_ID}}/\'"$VPC_ID"\'/g\' {} \\;\n' +
+                '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{APP_SECURITY_GROUP_ID}}/\'"$APP_SECURITY_GROUP_ID"\'/g\' {} \\;\n' +
+                '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{DATA_SECURITY_GROUP_ID}}/\'"$DATA_SECURITY_GROUP_ID"\'/g\' {} \\;\n' +
+                '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{APP_SUBNET_1}}/\'"${APP_SUBNET_ARRAY[0]}"\'/g\' {} \\;\n' +
+                '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{APP_SUBNET_2}}/\'"${APP_SUBNET_ARRAY[1]}"\'/g\' {} \\;\n' +
+                '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{DATA_SUBNET_1}}/\'"${DATA_SUBNET_ARRAY[0]}"\'/g\' {} \\;\n' +
+                '  find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/{{DATA_SUBNET_2}}/\'"${DATA_SUBNET_ARRAY[1]}"\'/g\' {} \\;\n' +
+                "fi'",
               './bin/mdaa -c sample_configs/${SAMPLE_NAME}/mdaa.yaml deploy',
               'echo "Deployment completed successfully"',
             ],
