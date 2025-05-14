@@ -13,6 +13,12 @@ export enum RepositorySources {
   S3 = 's3',
 }
 
+export enum ConfigTypes {
+  BASIC_DATALAKE = 'basic_datalake',
+  BASIC_DATASCIENCE = 'basic_datascience_platform',
+  BASIC_GAIA = 'basic_generative_ai_platform',
+}
+
 export class MdaaInstallerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, {
@@ -63,7 +69,7 @@ export class MdaaInstallerStack extends cdk.Stack {
     });
 
     const codeConnectArn = new cdk.CfnParameter(this, 'CodeConnectArn', {
-      type: 'String',
+      type: 'AWS::CodeConnections::Connection',
       description:
         'ARN of the CodeConnect connection to GitHub (Required for GitHub). Head over to the CodePipeline->Settings->Connections to create one',
       constraintDescription: 'CodeConnect ARN is required when GitHub is selected as the repository source',
@@ -127,7 +133,7 @@ export class MdaaInstallerStack extends cdk.Stack {
     const sampleNameParam = new cdk.CfnParameter(this, 'SampleName', {
       type: 'String',
       description: 'MDAA Sample you want to deploy',
-      allowedValues: ['basic_datalake', 'basic_datascience_platform'],
+      allowedValues: [`${ConfigTypes.BASIC_DATALAKE}`, `${ConfigTypes.BASIC_DATASCIENCE}`, `${ConfigTypes.BASIC_GAIA}`],
       default: 'basic_datalake',
     });
 
@@ -163,18 +169,62 @@ export class MdaaInstallerStack extends cdk.Stack {
         'The ID of the subnet to use for deployment. Must be a subnet within the selected VPC. Required for resources that need network access.',
     });
 
-    new cdk.CfnRule(this, 'ValidateNetworkParametersForDataScience', {
-      assertions: [
-        {
-          assert: cdk.Fn.conditionNot(cdk.Fn.conditionEquals(vpcIdParam.valueAsString, '')),
-          assertDescription: 'VPC ID is required.',
-        },
-        {
-          assert: cdk.Fn.conditionNot(cdk.Fn.conditionEquals(subnetIdParam.valueAsString, '')),
-          assertDescription: 'Subnet ID is required.',
-        },
-      ],
+    // Additional parameters for GenAI platform
+    const appSecurityGroupIdParam = new cdk.CfnParameter(this, 'AppSecurityGroupId', {
+      type: 'AWS::EC2::SecurityGroup::Id',
+      description: 'The ID of the security group to use for application components. Required for GenAI platform.',
     });
+
+    const appSubnetsParam = new cdk.CfnParameter(this, 'AppSubnets', {
+      type: 'List<AWS::EC2::Subnet::Id>',
+      description: 'The IDs of the subnets to use for application components. Required for GenAI platform.',
+    });
+
+    const dataSecurityGroupIdParam = new cdk.CfnParameter(this, 'DataSecurityGroupId', {
+      type: 'AWS::EC2::SecurityGroup::Id',
+      description: 'The ID of the security group to use for data components. Required for GenAI platform.',
+    });
+
+    const dataSubnetsParam = new cdk.CfnParameter(this, 'DataSubnets', {
+      type: 'List<AWS::EC2::Subnet::Id>',
+      description: 'The IDs of the subnets to use for data components. Required for GenAI platform.',
+    });
+
+    // Add validation rule for GenAI platform parameters
+    // new cdk.CfnRule(this, 'ValidateGenAIPlatformParameters', {
+    //   ruleCondition: cdk.Fn.conditionEquals(sampleNameParam.valueAsString, `${ConfigTypes.BASIC_GAIA}'}}`),
+    //   assertions: [
+    //     {
+    //       assert: cdk.Fn.conditionNot(cdk.Fn.conditionEquals(appSecurityGroupIdParam.valueAsString, '')),
+    //       assertDescription: 'App Security Group ID is required for GenAI platform.',
+    //     },
+    //     {
+    //       assert: cdk.Fn.conditionNot(cdk.Fn.conditionEquals(dataSecurityGroupIdParam.valueAsString, '')),
+    //       assertDescription: 'Data Security Group ID is required for GenAI platform.',
+    //     },
+    //   ],
+    // });
+
+    // new cdk.CfnRule(this, 'ValidateAppSubnetsForGenAI', {
+    //   ruleCondition: cdk.Fn.conditionEquals(sampleNameParam.valueAsString, `${ConfigTypes.BASIC_GAIA}'}}`),
+    //   assertions: [
+    //     {
+    //       assert: cdk.Fn.conditionNot(cdk.Fn.conditionEquals(appSubnetsParam.valueAsList, [])),
+    //       assertDescription: 'App Subnets are required for GenAI platform.',
+    //     },
+    //   ],
+    // });
+
+    // Add a separate rule for data subnets validation
+    // new cdk.CfnRule(this, 'ValidateDataSubnetsForGenAI', {
+    //   ruleCondition: cdk.Fn.conditionEquals(sampleNameParam.valueAsString, `${ConfigTypes.BASIC_GAIA}'}}`),
+    //   assertions: [
+    //     {
+    //       assert: cdk.Fn.conditionNot(cdk.Fn.conditionEquals(dataSubnetsParam.valueAsList, [])),
+    //       assertDescription: 'Data Subnets are required for GenAI platform.',
+    //     },
+    //   ],
+    // });
 
     // Define parameter groups for better organization in the CloudFormation console
     const parameterGroups: { Label: { default: string }; Parameters: string[] }[] = [
@@ -200,8 +250,17 @@ export class MdaaInstallerStack extends cdk.Stack {
         Parameters: [sampleNameParam.logicalId, orgNameParam.logicalId],
       },
       {
-        Label: { default: 'Network Configuration' },
+        Label: { default: 'Network Configuration (Skip if basic_datalake is selected)' },
         Parameters: [vpcIdParam.logicalId, subnetIdParam.logicalId],
+      },
+      {
+        Label: { default: 'GenAI Platform Configuration (Only if basic_generative_ai_platform is selected)' },
+        Parameters: [
+          appSecurityGroupIdParam.logicalId,
+          appSubnetsParam.logicalId,
+          dataSecurityGroupIdParam.logicalId,
+          dataSubnetsParam.logicalId,
+        ],
       },
     ];
 
@@ -217,6 +276,10 @@ export class MdaaInstallerStack extends cdk.Stack {
       [orgNameParam.logicalId]: { default: 'Organization Name (Required)' },
       [vpcIdParam.logicalId]: { default: 'VPC ID' },
       [subnetIdParam.logicalId]: { default: 'Subnet ID' },
+      [appSecurityGroupIdParam.logicalId]: { default: 'App Security Group ID' },
+      [appSubnetsParam.logicalId]: { default: 'App Subnets' },
+      [dataSecurityGroupIdParam.logicalId]: { default: 'Data Security Group ID' },
+      [dataSubnetsParam.logicalId]: { default: 'Data Subnets' },
     };
 
     this.templateOptions.metadata = {
@@ -230,6 +293,10 @@ export class MdaaInstallerStack extends cdk.Stack {
           [codeConnectArn.logicalId]: `{{${repositorySource.logicalId} == '${RepositorySources.GITHUB}'}}`,
           [repositoryBucketName.logicalId]: `{{${repositorySource.logicalId} == '${RepositorySources.S3}'}}`,
           [repositoryBucketObject.logicalId]: `{{${repositorySource.logicalId} == '${RepositorySources.S3}'}}`,
+          [appSecurityGroupIdParam.logicalId]: `{{${sampleNameParam.logicalId} == '${ConfigTypes.BASIC_GAIA}'}}`,
+          [appSubnetsParam.logicalId]: `{{${sampleNameParam.logicalId} == '${ConfigTypes.BASIC_GAIA}'}}`,
+          [dataSecurityGroupIdParam.logicalId]: `{{${sampleNameParam.logicalId} == '${ConfigTypes.BASIC_GAIA}'}}`,
+          [dataSubnetsParam.logicalId]: `{{${sampleNameParam.logicalId} == '${ConfigTypes.BASIC_GAIA}'}}`,
         },
       },
     };
@@ -293,6 +360,29 @@ export class MdaaInstallerStack extends cdk.Stack {
               'find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/<your vpc id>/\'"$VPC_ID"\'/g\' {} \\;',
               'find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/<your subnet id>/\'"$SUBNET_ID"\'/g\' {} \\;',
               'find sample_configs/${SAMPLE_NAME}/ -type f \\( -name "*.yaml" -o -name "*.yml" \\) -exec sed -i \'s/<data scientist user id>/\'"$ORG_NAME"\'-datascientist/g\' {} \\;',
+              // Add commands for GenAI platform parameters
+              'if [ "$SAMPLE_NAME" = "basic_generative_ai_platform" ]; then',
+              '  # Create SSM parameters for GenAI platform',
+              '  aws ssm put-parameter --name "/mdaa/gaia/vpc-id" --value "$VPC_ID" --type "String" --overwrite',
+              '  aws ssm put-parameter --name "/mdaa/gaia/app-sg-id" --value "$APP_SECURITY_GROUP_ID" --type "String" --overwrite',
+              '  aws ssm put-parameter --name "/mdaa/gaia/data-sg-id" --value "$DATA_SECURITY_GROUP_ID" --type "String" --overwrite',
+              '  # Handle app subnets',
+              '  IFS="," read -ra APP_SUBNET_ARRAY <<< "$APP_SUBNETS"',
+              '  if [ ${#APP_SUBNET_ARRAY[@]} -lt 2 ]; then',
+              '    echo "Error: At least 2 app subnets are required for GenAI platform"',
+              '    exit 1',
+              '  fi',
+              '  aws ssm put-parameter --name "/mdaa/gaia/app-subnet-1" --value "${APP_SUBNET_ARRAY[0]}" --type "String" --overwrite',
+              '  aws ssm put-parameter --name "/mdaa/gaia/app-subnet-2" --value "${APP_SUBNET_ARRAY[1]}" --type "String" --overwrite',
+              '  # Handle data subnets',
+              '  IFS="," read -ra DATA_SUBNET_ARRAY <<< "$DATA_SUBNETS"',
+              '  if [ ${#DATA_SUBNET_ARRAY[@]} -lt 2 ]; then',
+              '    echo "Error: At least 2 data subnets are required for GenAI platform"',
+              '    exit 1',
+              '  fi',
+              '  aws ssm put-parameter --name "/mdaa/gaia/data-subnet-1" --value "${DATA_SUBNET_ARRAY[0]}" --type "String" --overwrite',
+              '  aws ssm put-parameter --name "/mdaa/gaia/data-subnet-2" --value "${DATA_SUBNET_ARRAY[1]}" --type "String" --overwrite',
+              'fi',
               './bin/mdaa -c sample_configs/${SAMPLE_NAME}/mdaa.yaml deploy',
               'echo "Deployment completed successfully"',
             ],
@@ -342,6 +432,22 @@ export class MdaaInstallerStack extends cdk.Stack {
         SUBNET_ID: {
           type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
           value: subnetIdParam.valueAsString,
+        },
+        APP_SECURITY_GROUP_ID: {
+          type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
+          value: appSecurityGroupIdParam.valueAsString,
+        },
+        APP_SUBNETS: {
+          type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
+          value: cdk.Fn.join(',', appSubnetsParam.valueAsList),
+        },
+        DATA_SECURITY_GROUP_ID: {
+          type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
+          value: dataSecurityGroupIdParam.valueAsString,
+        },
+        DATA_SUBNETS: {
+          type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
+          value: cdk.Fn.join(',', dataSubnetsParam.valueAsList),
         },
       },
     });
