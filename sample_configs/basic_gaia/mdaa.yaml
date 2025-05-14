@@ -7,7 +7,7 @@ tag_configs:
   - ./tags.yaml
 
 ## Pre-Deployment Instructions
-organization: <add-org>
+organization: <unique-org-name>
 
 # One or more domains may be specified. Domain name will be incorporated by default naming implementation
 # to prefix all resource names.
