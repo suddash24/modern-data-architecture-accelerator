@@ -1,9 +1,12 @@
 {
   "name": "@aws-mdaa/installer",
-  "version": "0.1.0",
   "bin": {
     "mdaa-installer": "bin/mdaa-installer.js"
   },
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "solution_id": "SO0320",
+  "solution_name": "Modern Data Architecture Accelerator",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",

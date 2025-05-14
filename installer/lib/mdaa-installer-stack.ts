@@ -6,7 +6,8 @@ import * as kms from 'aws-cdk-lib/aws-kms';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
 import * as codepipeline_actions from 'aws-cdk-lib/aws-codepipeline-actions';
-import { version } from '../../package.json';
+
+const pjson = require('../package.json');
 
 export enum RepositorySources {
   GITHUB = 'github',
@@ -21,8 +22,18 @@ export enum ConfigTypes {
 
 export class MdaaInstallerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+    // Solution Details
+    const solutionId = pjson.solution_id;
+    const solutionName = pjson.solution_name;
+    const solutionVersion = pjson.version;
+    const version = pjson?.version ?? 'unknown';
+    const moduleName = 'Installer';
+
+    const stackDescription = `(${solutionId}-${moduleName}) ${solutionName}. Version ${solutionVersion}`;
+
     super(scope, id, {
       ...props,
+      description: stackDescription,
       synthesizer: new cdk.DefaultStackSynthesizer({
         generateBootstrapVersionRule: false,
       }),
