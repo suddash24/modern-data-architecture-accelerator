@@ -35,14 +35,14 @@ gaia:
   setApiGateWayAccountCloudwatchRole: true
   skipApiGatewayDefaultWaf: true
   vpc:
-    vpcId: "{{resolve:ssm:/path/to/vpc-id}}"
-    appSecurityGroupId: "{{resolve:ssm:/path/to/app-sg/id}}"
+    vpcId: "{{VPC_ID}}"
+    appSecurityGroupId: "{{APP_SECURITY_GROUP_ID}}"
     appSubnets:
-      - "{{resolve:ssm:/path/to/app-subnet-1}}"
-      - "{{resolve:ssm:/path/to/app-subnet-2}}"
-    dataSecurityGroupId: "{{resolve:ssm:/path/to/data-sg/id}}"
+      - "{{APP_SUBNET_1}}"
+      - "{{APP_SUBNET_2}}"
+    dataSecurityGroupId: "{{DATA_SECURITY_GROUP_ID}}"
     dataSubnets:
-      - "{{resolve:ssm:/path/to/data-subnet-1}}"
-      - "{{resolve:ssm:/path/to/data-subnet-2}}"
+      - "{{DATA_SUBNET_1}}"
+      - "{{DATA_SUBNET_2}}"
     createVpcEndpoints: true
     cidrBlock: "10.0.0.0/16"

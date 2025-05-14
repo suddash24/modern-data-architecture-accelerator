@@ -15,7 +15,7 @@ import { LangChainInterface } from './model-interfaces/langchain';
 import { Models } from './models';
 import { RagEngines } from './rag-engines';
 import { Shared } from './shared';
-import { Direction, ModelInterface, SystemConfig } from './shared/types';
+import { Direction, ModelInterface, SystemConfig, VpcProps } from './shared/types';
 import { Stack } from 'aws-cdk-lib';
 import { MdaaNagSuppressions } from '@aws-mdaa/construct'; //NOSONAR
 import { MdaaKmsKey, DECRYPT_ACTIONS, ENCRYPT_ACTIONS } from '@aws-mdaa/kms-constructs';
@@ -39,6 +39,11 @@ export class GAIAL3Construct extends MdaaL3Construct {
   constructor(scope: Construct, id: string, props: GAIAL3ConstructProps) {
     super(scope, id, props);
     this.props = props;
+
+    // Create SSM parameters for VPC resources
+    if (props.gaia.vpc) {
+      this.createVpcSsmParameters(props.gaia.vpc);
+    }
 
     const stackEncryptionKey = new MdaaKmsKey(this, 'StackEncryptionKey', {
       naming: props.naming,
@@ -218,5 +223,61 @@ export class GAIAL3Construct extends MdaaL3Construct {
         );
       }
     });
+  }
+  createVpcSsmParameters(vpc: VpcProps) {
+    const ssm = require('aws-cdk-lib/aws-ssm');
+
+    // Create SSM parameters for VPC resources
+    new ssm.StringParameter(this, 'VpcIdParam', {
+      parameterName: '/mdaa/gaia/vpc-id',
+      stringValue: vpc.vpcId,
+      description: 'VPC ID for GAIA deployment',
+    });
+
+    new ssm.StringParameter(this, 'AppSecurityGroupIdParam', {
+      parameterName: '/mdaa/gaia/app-sg-id',
+      stringValue: vpc.appSecurityGroupId,
+      description: 'Application Security Group ID for GAIA deployment',
+    });
+
+    new ssm.StringParameter(this, 'DataSecurityGroupIdParam', {
+      parameterName: '/mdaa/gaia/data-sg-id',
+      stringValue: vpc.dataSecurityGroupId,
+      description: 'Data Security Group ID for GAIA deployment',
+    });
+
+    // Create SSM parameters for app subnets
+    if (vpc.appSubnets && vpc.appSubnets.length >= 1) {
+      new ssm.StringParameter(this, 'AppSubnet1Param', {
+        parameterName: '/mdaa/gaia/app-subnet-1',
+        stringValue: vpc.appSubnets[0],
+        description: 'Application Subnet 1 for GAIA deployment',
+      });
+    }
+
+    if (vpc.appSubnets && vpc.appSubnets.length >= 2) {
+      new ssm.StringParameter(this, 'AppSubnet2Param', {
+        parameterName: '/mdaa/gaia/app-subnet-2',
+        stringValue: vpc.appSubnets[1],
+        description: 'Application Subnet 2 for GAIA deployment',
+      });
+    }
+
+    // Create SSM parameters for data subnets
+    if (vpc.dataSubnets && vpc.dataSubnets.length >= 1) {
+      new ssm.StringParameter(this, 'DataSubnet1Param', {
+        parameterName: '/mdaa/gaia/data-subnet-1',
+        stringValue: vpc.dataSubnets[0],
+        description: 'Data Subnet 1 for GAIA deployment',
+      });
+    }
+
+    if (vpc.dataSubnets && vpc.dataSubnets.length >= 2) {
+      new ssm.StringParameter(this, 'DataSubnet2Param', {
+        parameterName: '/mdaa/gaia/data-subnet-2',
+        stringValue: vpc.dataSubnets[1],
+        description: 'Data Subnet 2 for GAIA deployment',
+      });
+    }
   }
 }
