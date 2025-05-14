@@ -59,7 +59,7 @@ export class Shared extends Construct {
     });
 
     this.appSubnets = props.config.vpc.appSubnets.map(appSubnetId => {
-      return ec2.Subnet.fromSubnetAttributes(this, `subnet-${appSubnetId}`, {
+      return ec2.Subnet.fromSubnetAttributes(this, `${appSubnetId}`, {
         subnetId: appSubnetId,
       });
     });
@@ -71,7 +71,7 @@ export class Shared extends Construct {
     );
 
     this.dataSubnets = props.config.vpc.dataSubnets.map(dataSubnetId => {
-      return ec2.Subnet.fromSubnetAttributes(this, `subnet-${dataSubnetId}`, {
+      return ec2.Subnet.fromSubnetAttributes(this, `${dataSubnetId}`, {
         subnetId: dataSubnetId,
       });
     });
